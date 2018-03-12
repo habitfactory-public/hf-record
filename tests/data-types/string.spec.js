@@ -1,14 +1,13 @@
 const
 	assert = require('chai').assert,
-	StringType = require('../../libraries/data-types/string');
+	{ DataTypeFactory } = require('../../libraries/data-types/data-type');
 
 // char length 0 - 255 (765byte)
 // varchar length 0 - 21845 (65535byte)
 describe('string.js', () => {
 	describe('CHAR', () => {
-		describe('StrictMode true, length 10', () => {
-			const s = new StringType.CHAR({
-					strictMode: true,
+		describe('StrictMode true, length 4', () => {
+			const s = DataTypeFactory.createString('CHAR', {
 					length: 4
 				});
 
@@ -124,8 +123,8 @@ describe('string.js', () => {
 			});
 		});
 
-		describe('StrictMode false, length 10', () => {
-			const s = new StringType.CHAR({
+		describe('StrictMode false, length 4', () => {
+			const s = DataTypeFactory.createString('CHAR', {
 					strictMode: false,
 					length: 4
 				});
@@ -244,9 +243,8 @@ describe('string.js', () => {
 	});
 
 	describe('VARCHAR', () => {
-		describe('StrictMode true, length 10', () => {
-			const s = new VARCHAR({
-					strictMode: true,
+		describe('StrictMode true, length 4', () => {
+			const s = DataTypeFactory.createString('VARCHAR', {
 					length: 4
 				});
 
@@ -362,8 +360,8 @@ describe('string.js', () => {
 			});
 		});
 
-		describe('StrictMode false, length 10', () => {
-			const s = new VARCHAR({
+		describe('StrictMode false, length 4', () => {
+			const s = DataTypeFactory.createString('VARCHAR', {
 					strictMode: false,
 					length: 4
 				});

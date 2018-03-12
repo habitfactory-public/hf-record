@@ -55,4 +55,22 @@ class DataType {
 	}
 }
 
-module.exports = { DataType };
+class DataTypeFactory {
+	static createDataType(file, className, options) {
+		return new (require(file)[className])(options);
+	}
+
+	static createDateAndTime(className, options = {}) {
+		return DataTypeFactory.createDataType('./date-and-time', className, options);
+	}
+
+	static createNumeric(className, options = {}) {
+		return DataTypeFactory.createDataType('./numeric', className, options);
+	}
+
+	static createString(className, options = {}) {
+		return DataTypeFactory.createDataType('./string', className, options);
+	}
+}
+
+module.exports = { DataType, DataTypeFactory };

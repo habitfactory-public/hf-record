@@ -1,7 +1,7 @@
 const
 	_ = require('underscore'),
 	assert = require('chai').assert,
-	Numeric = require('../../libraries/data-types/numeric'),
+	{ DataTypeFactory } = require('../../libraries/data-types/data-type'),
 
 	// 참조 https://dev.mysql.com/doc/refman/5.7/en/integer-types.html
 	numericDataTypeInfos = {
@@ -65,7 +65,7 @@ describe('numeric.js', () => {
 
 		describe(key, () => {
 			describe('strictMode true, isUnsigned false (without options)', () => {
-				const int = new Numeric[key]();
+				const int = DataTypeFactory.createNumeric(key);
 
 				/**
 				 * 공통 테스트
@@ -145,7 +145,7 @@ describe('numeric.js', () => {
 			});
 
 			describe('strictMode false, isUnsigned false', () => {
-				const int = new Numeric[key]({
+				const int = DataTypeFactory.createNumeric(key, {
 						strictMode: false,
 						isUnsigned: false
 					});
@@ -225,7 +225,7 @@ describe('numeric.js', () => {
 			});
 
 			describe('strictMode false, isUnsigned true', () => {
-				const int = new Numeric[key]({
+				const int = DataTypeFactory.createNumeric(key, {
 						strictMode: false,
 						isUnsigned: true
 					});
@@ -305,7 +305,7 @@ describe('numeric.js', () => {
 			});
 
 			describe('strictMode true, isUnsigned true', () => {
-				const int = new Numeric[key]({
+				const int = DataTypeFactory.createNumeric(key, {
 						strictMode: true,
 						isUnsigned: true
 					});

@@ -1,14 +1,14 @@
 const
 	assert = require('chai').assert,
 	moment = require('moment'),
-	DateAndTime = require('../../libraries/data-types/date-and-time');
+	{ DataTypeFactory } = require('../../libraries/data-types/data-type');
 
 describe('date-and-time.js', () => {
 	// TODO
 	// '1000-01-01' - '9999-12-31' 범위 테스트 추가해야함
 	describe('Date', () => {
 		describe('StrictMode true', () => {
-			const dt = new DateAndTime.Date();
+			const dt = DataTypeFactory.createDateAndTime('Date');
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
@@ -98,7 +98,7 @@ describe('date-and-time.js', () => {
 		});
 
 		describe('StrictMode false', () => {
-			const dt = new DateAndTime.Date({
+			const dt = DataTypeFactory.createDateAndTime('Date', {
 					strictMode: false
 				});
 
@@ -194,7 +194,7 @@ describe('date-and-time.js', () => {
 	// '-838:59:59' - '838:59:59' 범위 체크 추가해야함.
 	describe('Time', () => {
 		describe('StrictMode true', () => {
-			const dt = new DateAndTime.Time();
+			const dt = DataTypeFactory.createDateAndTime('Time');
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
@@ -276,7 +276,7 @@ describe('date-and-time.js', () => {
 		});
 
 		describe('StrictMode false', () => {
-			const dt = new DateAndTime.Time({
+			const dt = DataTypeFactory.createDateAndTime('Time', {
 					strictMode: false
 				});
 
@@ -364,7 +364,7 @@ describe('date-and-time.js', () => {
 	// '1000-01-01 00:00:00' - '9999-12-31 23:59:59' 범위 체크 추가해야함.
 	describe('Datetime', () => {
 		describe('StrictMode true', () => {
-			const dt = new DateAndTime.Datetime();
+			const dt = DataTypeFactory.createDateAndTime('Datetime');
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
@@ -446,7 +446,7 @@ describe('date-and-time.js', () => {
 		});
 
 		describe('StrictMode false', () => {
-			const dt = new DateAndTime.Datetime({
+			const dt = DataTypeFactory.createDateAndTime('Datetime', {
 					strictMode: false
 				});
 
@@ -534,7 +534,7 @@ describe('date-and-time.js', () => {
 	// '1970-01-01 00:00:01' UTC - '2038-01-19 03:14:07' UTC 범위 체크 추가해야함.
 	describe('Timestamp', () => {
  		describe('StrictMode true', () => {
- 			const dt = new DateAndTime.Timestamp();
+			const dt = DataTypeFactory.createDateAndTime('Timestamp');
 
  			it('checks default values', () => {
  				assert.deepEqual(dt.options, {
@@ -616,9 +616,10 @@ describe('date-and-time.js', () => {
  		});
 
  		describe('StrictMode false', () => {
- 			const dt = new DateAndTime.Timestamp({
+			const dt = DataTypeFactory.createDateAndTime('Timestamp', {
  					strictMode: false
  				});
+
 
  			it('checks default values', () => {
  				assert.deepEqual(dt.options, {
@@ -704,7 +705,7 @@ describe('date-and-time.js', () => {
 	// '1901' - '2155' UTC 범위 체크 추가해야함.
 	describe('Year', () => {
 		describe('StrictMode true', () => {
-			const dt = new DateAndTime.Year();
+			const dt = DataTypeFactory.createDateAndTime('Year');
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
@@ -810,7 +811,7 @@ describe('date-and-time.js', () => {
 		});
 
 		describe('StrictMode false', () => {
-			const dt = new DateAndTime.Year({
+			const dt = DataTypeFactory.createDateAndTime('Year', {
 					strictMode: false
 				});
 
