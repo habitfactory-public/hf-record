@@ -478,4 +478,155 @@ describe('string.js', () => {
 			});
 		});
 	});
+
+	describe('ENUM', () => {
+		describe('Values', () => {
+			it('checks default values #1', () => {
+				assert.deepEqual(DataTypeFactory.createString('ENUM', {	values: ['a', 'b', 'c', 'd'] }).options.values, [[1, 'a'], [2, 'b'], [3, 'c'], [4, 'd']]);
+			});
+
+			it('checks default values #2', () => {
+				assert.deepEqual(DataTypeFactory.createString('ENUM', {	values: 'a, b, c, d' }).options.values, [[1, 'a'], [2, 'b'], [3, 'c'], [4, 'd']]);
+			});
+		});
+
+		describe('StrictMode true', () => {
+			const s = DataTypeFactory.createString('ENUM', {
+					values: ['a', 'b', 'c', 'd']
+				});
+
+			it('checks default values', () => {
+				assert.deepEqual(s.options, {
+					strictMode: true,
+					values: [[1, 'a'], [2, 'b'], [3, 'c'], [4, 'd']]
+				});
+			});
+
+			it('validates null', () => {
+				assert.isTrue(s.validate(null));
+			});
+
+			it('validates ""', () => {
+				assert.isFalse(s.validate(''));
+			});
+
+			it('validates 0', () => {
+				assert.isFalse(s.validate(0));
+			});
+
+			it('validates "a"', () => {
+				assert.isTrue(s.validate('a'));
+			});
+
+			it('validates 1', () => {
+				assert.isTrue(s.validate(1));
+			});
+
+			it('validates "e"', () => {
+				assert.isFalse(s.validate('e'));
+			});
+
+			it('validates 5', () => {
+				assert.isFalse(s.validate(5));
+			});
+
+			it('transforms null into null', () => {
+				assert.strictEqual(s.transform(null), null);
+			});
+
+			it('transforms "" throws TypeError', () => {
+				assert.throws(() => s.transform(''), TypeError);
+			});
+
+			it('transforms 0 throws TypeError', () => {
+				assert.throws(() => s.transform(0), TypeError);
+			});
+
+			it('transforms "a" into "a"', () => {
+				assert.strictEqual(s.transform('a'), 'a');
+			});
+
+			it('transforms 1 into "a"', () => {
+				assert.strictEqual(s.transform(1), 'a');
+			});
+
+			it('transforms "e" throws TypeError', () => {
+				assert.throws(() => s.transform('e'), TypeError);
+			});
+
+			it('transforms 5 throws TypeError', () => {
+				assert.throws(() => s.transform(5), TypeError);
+			});
+		});
+
+		describe('StrictMode false', () => {
+			const s = DataTypeFactory.createString('ENUM', {
+					strictMode: false,
+					values: ['a', 'b', 'c', 'd']
+				});
+
+			it('checks default values', () => {
+				assert.deepEqual(s.options, {
+					strictMode: false,
+					values: [[0, ''], [1, 'a'], [2, 'b'], [3, 'c'], [4, 'd']]
+				});
+			});
+
+			it('validates null', () => {
+				assert.isTrue(s.validate(null));
+			});
+
+			it('validates ""', () => {
+				assert.isTrue(s.validate(''));
+			});
+
+			it('validates 0', () => {
+				assert.isTrue(s.validate(0));
+			});
+
+			it('validates "a"', () => {
+				assert.isTrue(s.validate('a'));
+			});
+
+			it('validates 1', () => {
+				assert.isTrue(s.validate(1));
+			});
+
+			it('validates "e"', () => {
+				assert.isTrue(s.validate('e'));
+			});
+
+			it('validates 5', () => {
+				assert.isTrue(s.validate(5));
+			});
+
+			it('transforms null into null', () => {
+				assert.strictEqual(s.transform(null), null);
+			});
+
+			it('transforms "" into ""', () => {
+				assert.strictEqual(s.transform(''), '');
+			});
+
+			it('transforms 0 into ""', () => {
+				assert.strictEqual(s.transform(0), '');
+			});
+
+			it('transforms "a" into "a"', () => {
+				assert.strictEqual(s.transform('a'), 'a');
+			});
+
+			it('transforms 1 into "a"', () => {
+				assert.strictEqual(s.transform(1), 'a');
+			});
+
+			it('transforms "e" into ""', () => {
+				assert.strictEqual(s.transform('e'), '');
+			});
+
+			it('transforms 5 into ""', () => {
+				assert.strictEqual(s.transform(5), '');
+			});
+		});
+	});
 });
