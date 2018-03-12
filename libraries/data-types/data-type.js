@@ -10,12 +10,22 @@ class DataType {
 	}
 
 	addValidator(validator) {
-		this.validators.push(validator);
+		if(_.isArray(validator)) {
+			this.validators = this.validators.concat(validator);
+		} else {
+			this.validators.push(validator);
+		}
+
 		return this;
 	}
 
 	addTransformer(transformer) {
-		this.transformers.push(transformer);
+		if(_.isArray(transformer)) {
+			this.transformers = this.transformers.concat(transformer);
+		} else {
+			this.transformers.push(transformer);
+		}
+
 		return this;
 	}
 
