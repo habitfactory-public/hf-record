@@ -52,43 +52,46 @@ class DateAndTime extends require('./data-type').DataType {
 		};
 	}
 
-	addDateAndTimeTransformer(format) {
-		if(this.options.strictMode) {
-			this
-				.addTransformer(value => {
-					if(!this.validate(value)) {
-						throw new TypeError(value);
-					}
+	getStrictDateAndTimeTransformer(format) {
+		return [
+			value => {
+				if(!this.validate(value)) {
+					throw new TypeError(value);
+				}
 
-					return value;
-				})
-				.addTransformer(value => {
-					if(Number.isInteger(value) && (value + '').length <= 10) {
-						value *= 1000;
-					}
+				return value;
+			},
+			value => {
+				if(Number.isInteger(value) && (value + '').length <= 10) {
+					value *= 1000;
+				}
 
-					return value;
-				})
-				.addTransformer(value => {
+				return moment(value).format(format);
+			}
+		];
+	}
+
+	getNonStrictDateAndTimeTransformer(format) {
+		return [
+			value => {
+				if(Number.isInteger(value) && (value + '').length <= 10) {
+					value *= 1000;
+				}
+
+				return value;
+			},
+			value => {
+				if(this.validate(value, true)) {
 					return moment(value).format(format);
-				});
-		} else {
-			this
-				.addTransformer(value => {
-					if(Number.isInteger(value) && (value + '').length <= 10) {
-						value *= 1000;
-					}
+				} else {
+					return '0';
+				}
+			}
+		];
+	}
 
-					return value;
-				})
-				.addTransformer(value => {
-					if(this.validate(value, true)) {
-						return moment(value).format(format);
-					} else {
-						return '0';
-					}
-				});
-		}
+	getDateAndTimeTransformer(format) {
+		return this.options.strictMode ? this.getStrictDateAndTimeTransformer(format) : this.getNonStrictDateAndTimeTransformer(format);
 	}
 };
 
@@ -96,7 +99,7 @@ exports.Date = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
 		super({ strictMode });
 		this.addValidator(this.getPatternValidator(patterns.Date));
-		this.addDateAndTimeTransformer('YYYY-MM-DD');
+		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD'));
 	}
 };
 
@@ -113,7 +116,7 @@ exports.Time = class extends DateAndTime {
 
 			return value;
 		});
-		this.addDateAndTimeTransformer(('HH:mm:ss'));
+		this.addTransformer(this.getDateAndTimeTransformer('HH:mm:ss'));
 	}
 };
 
@@ -121,7 +124,7 @@ exports.Datetime = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
 		super({ strictMode });
 		this.addValidator(this.getPatternValidator(patterns.Datetime));
-		this.addDateAndTimeTransformer('YYYY-MM-DD HH:mm:ss');
+		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD HH:mm:ss'));
 	}
 };
 
@@ -129,7 +132,7 @@ exports.Timestamp = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
 		super({ strictMode });
 		this.addValidator(this.getPatternValidator(patterns.Timestamp));
-		this.addDateAndTimeTransformer('YYYY-MM-DD HH:mm:ss');
+		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD HH:mm:ss'));
 	}
 };
 
@@ -146,6 +149,6 @@ exports.Year = class extends DateAndTime {
 
 			return value;
 		});
-		this.addDateAndTimeTransformer('YYYY');
+		this.addTransformer(this.getDateAndTimeTransformer('YYYY'));
 	}
 };

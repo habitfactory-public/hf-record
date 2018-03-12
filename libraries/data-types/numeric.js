@@ -53,36 +53,41 @@ class Numeric extends require('./data-type').DataType {
 		return value => value >= MIN && value <= MAX;
 	}
 
-	addNumericTransformer() {
+	getStrictNumericTransformer() {
+		return value => {
+			if(!this.validate(value)) {
+				throw new TypeError(value);
+			}
+
+			return value;
+		};
+	}
+
+	getNonStrictNumericTransformer() {
 		const
 			isNumeric = value => /^[0-9]+$/.test(value),
 			{ MIN, MAX } = this.getRanges();
 
-		if(this.options.strictMode) {
-			this.addTransformer(value => {
-				if(!this.validate(value)) {
-					throw new TypeError(value);
+		return [
+			value => {
+				if(typeof value === 'string' && isNumeric(value)) {
+					value = value * 1;
 				}
 
 				return value;
-			});
-		} else {
-			this
-				.addTransformer(value => {
-					if(typeof value === 'string' && isNumeric(value)) {
-						value = value * 1;
-					}
+			},
+			value => {
+				if(Number.isInteger(value)) {
+					return Math.min(Math.max(value, MIN), MAX);
+				} else {
+					return 0;
+				}
+			}
+		];
+	}
 
-					return value;
-				})
-				.addTransformer(value => {
-					if(Number.isInteger(value)) {
-						return Math.min(Math.max(value, MIN), MAX);
-					} else {
-						return 0;
-					}
-				});
-		}
+	getNumericTransformer() {
+		return this.options.strictMode ? this.getStrictNumericTransformer() : this.getNonStrictNumericTransformer();
 	}
 }
 
@@ -99,7 +104,7 @@ exports.TinyInt = class extends Numeric {
 			}
 		});
 		this.addValidator(this.getRangeValidator());
-		this.addNumericTransformer();
+		this.addTransformer(this.getNumericTransformer());
 	}
 };
 
@@ -116,7 +121,7 @@ exports.SmallInt = class extends Numeric {
 			}
 		});
 		this.addValidator(this.getRangeValidator());
-		this.addNumericTransformer();
+		this.addTransformer(this.getNumericTransformer());
 	}
 };
 
@@ -133,7 +138,7 @@ exports.MediumInt = class extends Numeric {
 			}
 		});
 		this.addValidator(this.getRangeValidator());
-		this.addNumericTransformer();
+		this.addTransformer(this.getNumericTransformer());
 	}
 };
 
@@ -150,7 +155,7 @@ exports.Int = class extends Numeric {
 			}
 		});
 		this.addValidator(this.getRangeValidator());
-		this.addNumericTransformer();
+		this.addTransformer(this.getNumericTransformer());
 	}
 };
 
@@ -172,6 +177,6 @@ exports.BigInt = class extends Numeric {
 			}
 		});
 		this.addValidator(this.getRangeValidator());
-		this.addNumericTransformer();
+		this.addTransformer(this.getNumericTransformer());
 	}
 };
