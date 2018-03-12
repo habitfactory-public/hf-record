@@ -99,7 +99,7 @@ describe('string.js', () => {
 			});
 
 			it('transforms 12345 throws TypeError', () => {
-				assert.throws(s.transform(12345), TypeError);
+				assert.throws(() => s.transform(12345), TypeError);
 			});
 
 			it('transforms "abc" into "abc"', () => {
@@ -119,7 +119,7 @@ describe('string.js', () => {
 			});
 
 			it('transforms "가1a !" throws TypeError', () => {
-				assert.throws(s.transform('가1a !'), TypeError);
+				assert.throws(() => s.transform('가1a !'), TypeError);
 			});
 		});
 
@@ -336,7 +336,7 @@ describe('string.js', () => {
 			});
 
 			it('transforms 12345 throws TypeError', () => {
-				assert.throws(s.transform(12345), TypeError);
+				assert.throws(() => s.transform(12345), TypeError);
 			});
 
 			it('transforms "abc" into "abc"', () => {
@@ -356,7 +356,7 @@ describe('string.js', () => {
 			});
 
 			it('transforms "가1a !" throws TypeError', () => {
-				assert.throws(s.transform('가1a !'), TypeError);
+				assert.throws(() => s.transform('가1a !'), TypeError);
 			});
 		});
 

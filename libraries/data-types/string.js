@@ -1,16 +1,21 @@
 exports = module.exports = {};
 
+const rtrim = string => {
+		return string.replace(/[\s\uFEFF\xA0]+$/g, '');
+	};
+
 /**
  * strictMode가 true
  * validate는 모든 validator를 반드시 통과해야한다.
  * transform은 validate를 통과하지 못하는 입력값에 대해선 TypeError를 던진다.
  *
  * validator는
- * 1. Number.isInteger(value)를 통과.
- * 2. 타입별 정수 범위를 초과하지 않는 것.
+ * 1. Number.isInteger(value) || typeof value === 'string'을 통과.
+ * 2. 정의된 length 이내여야 함.
  *
  * transformer는
- * 1. validator를 통과하지 못하는 경우는 TypeError를 발생.
+ * 1. 정수는 문자열로 변환
+ * 2. 우측 공백들은 ''으로 변환
  *
  * --->
  *
@@ -23,104 +28,83 @@ exports = module.exports = {};
  * 1. 모두 true를 반환. (validate 하지 않음)
  *
  * transformer는
- * 1. 숫자로만 이루어진 문자열의 경우 정수로 변환.
- * 2. 타입별 정수범위를 넘어가는 정수들은 정수범위 max, min으로 수정.
- * 3. 그 외에는 0으로 변환.
+ * 1. 정수는 문자열로 변환
+ * 2. 우측 공백들은 ''으로 변환
+ * 3. length를 넘어서는 것들은 length까지만 자름.
  */
 class String extends require('./data-type').DataType {
 	constructor(options = {}) {
 		super(options);
-		this.addValidator(value => Number.isInteger(value));
+		this.addValidator(value => Number.isInteger(value) || typeof value === 'string');
 	}
 
-	getRanges() {
-		if(this.options.isUnsigned) {
-			return {
-				MIN: this.options.ranges.UNSIGNED_MIN,
-				MAX: this.options.ranges.UNSIGNED_MAX
-			};
-		} else {
-			return {
-				MIN: this.options.ranges.MIN,
-				MAX: this.options.ranges.MAX
-			};
-		}
-	}
-
-	getRangeValidator() {
-		const { MIN, MAX } = this.getRanges();
-
-		return value => value >= MIN && value <= MAX;
-	}
-
-	getStrictNumericTransformer() {
+	getLengthValidator() {
 		return value => {
-			if(!this.validate(value)) {
-				throw new TypeError(value);
+			if(Number.isInteger(value)) {
+				value += '';
 			}
 
-			return value;
+			return rtrim(value).length <= this.options.length;
 		};
 	}
 
-	getNonStrictNumericTransformer() {
-		const
-			isNumeric = value => /^[0-9]+$/.test(value),
-			{ MIN, MAX } = this.getRanges();
-
+	getStrictStringTransformer() {
 		return [
 			value => {
-				if(typeof value === 'string' && isNumeric(value)) {
-					value = value * 1;
+				if(!this.validate(value)) {
+					throw new TypeError(value);
 				}
 
 				return value;
 			},
 			value => {
 				if(Number.isInteger(value)) {
-					return Math.min(Math.max(value, MIN), MAX);
-				} else {
-					return 0;
+					value += '';
 				}
-			}
+
+				return value;
+			},
+			value => rtrim(value)
 		];
 	}
 
-	getNumericTransformer() {
-		return this.options.strictMode ? this.getStrictNumericTransformer() : this.getNonStrictNumericTransformer();
+	getNonStrictStringTransformer() {
+		return [
+			value => {
+				if(Number.isInteger(value)) {
+					value += '';
+				}
+
+				return value;
+			},
+			value => {
+				if(value.length > this.options.length) {
+					value = value.substr(0, this.options.length);
+				}
+
+				return value;
+			},
+			value => rtrim(value)
+		];
+	}
+
+	getStringTransformer() {
+		return this.options.strictMode ? this.getStrictStringTransformer() : this.getNonStrictStringTransformer();
 	}
 }
 
 exports.CHAR = class extends String {
-	constructor({ strictMode = true, isUnsigned = false} = {}) {
-		super({
-			strictMode: strictMode,
-			isUnsigned: isUnsigned,
-			ranges: {
-				MIN: -128,
-				MAX: 128,
-				UNSIGNED_MIN: 0,
-				UNSIGNED_MAX: 255
-			}
-		});
-		this.addValidator(this.getRangeValidator());
-		this.addTransformer(this.getNumericTransformer());
+	constructor({ strictMode = true, length = 255} = {}) {
+		super({ strictMode, length });
+		this.addValidator(this.getLengthValidator());
+		this.addTransformer(this.getStringTransformer());
 	}
 };
 
 exports.VARCHAR = class extends String {
-	constructor({ strictMode = true, isUnsigned = false} = {}) {
-		super({
-			strictMode: strictMode,
-			isUnsigned: isUnsigned,
-			ranges: {
-				MIN: -32768,
-				MAX: 32768,
-				UNSIGNED_MIN: 0,
-				UNSIGNED_MAX: 65535
-			}
-		});
-		this.addValidator(this.getRangeValidator());
-		this.addTransformer(this.getNumericTransformer());
+	constructor({ strictMode = true, length = 21844} = {}) {
+		super({ strictMode, length });
+		this.addValidator(this.getLengthValidator());
+		this.addTransformer(this.getStringTransformer());
 	}
 };
