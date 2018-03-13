@@ -92,7 +92,7 @@ describe('data-type.js', () => {
 		});
 
 		describe('createString', () => {
-			for(let className of ['CHAR', 'VARCHAR']) {
+			for(let className of ['Char', 'Varchar']) {
 				it(className, () => {
 					assert.instanceOf(DataTypeFactory.createString(className), StringType[className]);
 				});
