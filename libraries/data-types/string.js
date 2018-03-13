@@ -35,7 +35,7 @@ const rtrim = string => {
 class String extends require('./data-type').DataType {
 	constructor(options = {}) {
 		super(options);
-		this.addValidator(value => Number.isInteger(value) || typeof value === 'string' || value === null);
+		this.addValidator(value => Number.isInteger(value) || typeof value === 'string' || value === null || Array.isArray(value));
 	}
 
 	getLengthValidator() {
@@ -93,7 +93,7 @@ class String extends require('./data-type').DataType {
 	}
 }
 
-exports.CHAR = class extends String {
+exports.Char = class extends String {
 	constructor({ strictMode = true, length = 255} = {}) {
 		super({ strictMode, length });
 		this.addValidator(this.getLengthValidator());
@@ -101,7 +101,7 @@ exports.CHAR = class extends String {
 	}
 };
 
-exports.VARCHAR = class extends String {
+exports.Varchar = class extends String {
 	constructor({ strictMode = true, length = 21844} = {}) {
 		super({ strictMode, length });
 		this.addValidator(this.getLengthValidator());
@@ -109,8 +109,8 @@ exports.VARCHAR = class extends String {
 	}
 };
 
-exports.ENUM = class extends String {
-	constructor({ strictMode = true, values = []} = {}) {
+class Enumerable {
+	constructor({ strictMode, values }) {
 		// 문자열로 들어오는 경우는 ,로 나눠서 배열로 만든다.
 		// index는 ''로부터 시작.
 		//
@@ -120,25 +120,49 @@ exports.ENUM = class extends String {
 		// enumerable값 가운데 공백문자가 없다면 공백문자를 컬럼에 대한 값으로 사용할 수 없지만,
 		// strictMode가 false라면
 		// enumerable값을 벗어난 값에 대해선 자동으로 공백문자를 값으로 대신하며 이때 index는 0이다.
+		this.keys = new Map();
+		this.values = new Map();
+
 		if(typeof values === 'string') {
 			values = values
 				.split(',')
 				.map(value => value.trim());
 		}
-		values = values.map((value, i) => [i + 1, value]);
-		if(!strictMode && values.filter(value => value[1] === '').length == 0) {
-			values.unshift([0, '']);
-		}
 
-		super({ strictMode, values });
+		values.forEach((value, i) => {
+			this.keys.set(i + 1, value);
+			this.values.set(value, i + 1);
+		});
+
+		if(!strictMode && !this.keys.has('')) {
+			this.keys.set(0, '');
+			this.values.set('', 0);
+		}
+	}
+}
+
+exports.Enum = class extends String {
+	constructor({ strictMode = true, values = []} = {}) {
+		super({
+			strictMode: strictMode,
+			values: new Enumerable({ strictMode, values })
+		});
 		this.addValidator(value => {
-			if(value === null
-				|| (Number.isInteger(value) && this.hasIndex(value))
-				|| (typeof value === 'string' && this.hasElement(value))) {
+			const values = this.options.values;
+
+			if(value === null) {
 				return true;
-			} else {
-				return false;
 			}
+
+			if(Number.isInteger(value) && values.keys.has(value)) {
+				return true;
+			}
+
+			if(typeof value === 'string' && values.values.has(value)) {
+				return true;
+			}
+
+			return false;
 		});
 
 		if(strictMode) {
@@ -152,7 +176,7 @@ exports.ENUM = class extends String {
 				},
 				value => {
 					if(Number.isInteger(value)) {
-						return this.getElement(value);
+						return this.options.values.keys.get(value);
 					} else {
 						return value;
 					}
@@ -161,35 +185,204 @@ exports.ENUM = class extends String {
 		} else {
 			this.addTransformer([
 				value => {
+					const values = this.options.values;
+
 					if(value === null) {
 						return null;
-					} else if(Number.isInteger(value) && this.hasIndex(value)) {
-						return this.getElement(value);
-					} else if(typeof value === 'string' && this.hasElement(value)) {
-						return value;
-					} else {
-						return '';
 					}
+
+					if(Number.isInteger(value) && values.keys.has(value)) {
+						return values.keys.get(value);
+					}
+
+					if(typeof value === 'string' && values.values.has(value)) {
+						return value;
+					}
+
+					return '';
 				}
 			]);
 		}
 	}
+};
 
-	hasIndex(index) {
-		return this.options.values.filter(value => value[0] === index).length > 0;
+class Settable {
+	constructor({ strictMode, values }) {
+		// 문자열로 들어오는 경우는 ,로 나눠서 배열로 만든다.
+		//
+		// set의 10진수 정수형 값은 2의 N(N은 0으로부터 시작하는 인덱스)승으로 정해진다.
+		//
+		// 2진수인 경우는 따라서 값마다 자리수가 변경됨.
+		this.keys = new Map();
+		this.values = new Map();
+
+		if(typeof values === 'string') {
+			values = values
+				.split(',')
+				.map(value => value.trim());
+		}
+
+		values.forEach((value, i) => {
+			this.keys.set(Math.pow(2, i), value);
+			this.values.set(value, Math.pow(2, i));
+		});
 	}
 
-	hasElement(element) {
-		return this.options.values.filter(value => value[1] === element).length > 0;
+	getMaxDecimalValue() {
+		return Math.pow(2, this.keys.size - 1);
 	}
 
-	getElement(index) {
-		for(let value of this.options.values) {
-			if(value[0] === index) {
-				return value[1];
+	isUnderMaxDecimalValue(value) {
+		return this.getMaxDecimalValue() >= value;
+	}
+
+	includes(value) {
+		if(typeof value === 'string') {
+			if(value.indexOf(',') >= 0) {
+				value = value.split(',').map(value => value.trim());
+			} else {
+				value = [value];
 			}
 		}
 
-		return false;
+		if(value.length > this.values.keys.size) {
+			return false;
+		}
+
+		if(value.filter(value => this.values.has(value)).length === value.length) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	decimalValueToItems(value) {
+		return (value >>> 0)
+			.toString(2)
+			.split('')
+			.reverse()
+			.map((bin, i) => bin == '1' ? this.keys.get(Math.pow(2, i)) : undefined)
+			.filter(value => !!value)
+			.join(', ');
+	}
+}
+
+exports.Set = class extends String {
+	constructor({ strictMode = true, values = []} = {}) {
+		super({
+			strictMode: strictMode,
+			values: new Settable({ strictMode, values })
+		});
+		this.addValidator(value => {
+			const values = this.options.values;
+
+			if(value === null) {
+				return true;
+			}
+
+			// 정수라면 최대 인덱스 (2의 N승) 이내여야 함.
+			if(Number.isInteger(value) && value > 0 && values.isUnderMaxDecimalValue(value)) {
+				return true;
+			}
+
+			if((typeof value === 'string' || Array.isArray(value)) && values.includes(value)) {
+				return true;
+			}
+
+			return false;
+		});
+
+		if(strictMode) {
+			this.addTransformer([
+				value => {
+					if(!this.validate(value)) {
+						throw new TypeError(value);
+					}
+
+					return value;
+				},
+				value => {
+					const values = this.options.values;
+
+					if(value === null) {
+						return null;
+					}
+
+					if(Number.isInteger(value) && value > 0 && values.isUnderMaxDecimalValue(value)) {
+						return values.decimalValueToItems(value);
+					}
+
+					if((typeof value === 'string' || Array.isArray(value)) && values.includes(value)) {
+						return value;
+					}
+
+					throw new TypeError(value);
+				}
+			]);
+		} else {
+			this.addTransformer([
+				value => {
+					const values = this.options.values;
+
+					if(value === null) {
+						return null;
+					}
+
+					if(Number.isInteger(value) && value > 0 && values.isUnderMaxDecimalValue(value)) {
+						return values.decimalValueToItems(value);
+					}
+
+					if((typeof value === 'string' || Array.isArray(value)) && values.includes(value)) {
+						return value;
+					}
+
+					return '';
+				}
+			]);
+		}
+	}
+};
+
+exports.TinyText = class extends String {
+	constructor({ strictMode = true} = {}) {
+		super({
+			strictMode: strictMode,
+		 	length: 255
+		});
+		this.addValidator(this.getLengthValidator());
+		this.addTransformer(this.getStringTransformer());
+	}
+};
+
+exports.Text = class extends String {
+	constructor({ strictMode = true} = {}) {
+		super({
+			strictMode: strictMode,
+		 	length: 65535
+		});
+		this.addValidator(this.getLengthValidator());
+		this.addTransformer(this.getStringTransformer());
+	}
+};
+
+exports.MediumText = class extends String {
+	constructor({ strictMode = true} = {}) {
+		super({
+			strictMode: strictMode,
+		 	length: 16777215
+		});
+		this.addValidator(this.getLengthValidator());
+		this.addTransformer(this.getStringTransformer());
+	}
+};
+
+exports.LongText = class extends String {
+	constructor({ strictMode = true} = {}) {
+		super({
+			strictMode: strictMode,
+		 	length: 4294967295
+		});
+		this.addValidator(this.getLengthValidator());
+		this.addTransformer(this.getStringTransformer());
 	}
 };
