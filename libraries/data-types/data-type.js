@@ -1,3 +1,29 @@
+class Transformed {
+	constructor(value) {
+		this._value = value;
+		this._resolved = false;
+	}
+
+	resolve() {
+		this._resolved = true;
+
+		return this;
+	}
+
+	get resolved() {
+		return this._resolved;
+	}
+
+	value(value) {
+		if(value !== undefined) {
+			this._value = value;
+			return this;
+		} else {
+			return this._value;
+		}
+	}
+}
+
 class DataType {
 	constructor(options = {}) {
 		options.strictMode = options.strictMode === undefined ? true : options.strictMode;
@@ -44,8 +70,13 @@ class DataType {
 
 		return this.transformers
 			.reduce((accumulator, transformer) => {
-				return transformer(accumulator);
-			}, value);
+				if(accumulator.resolved) {
+					return accumulator;
+				} else {
+					return transformer(accumulator);
+				}
+			}, new Transformed(value))
+			.value();
 	}
 }
 

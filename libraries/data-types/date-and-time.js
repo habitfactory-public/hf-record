@@ -1,7 +1,6 @@
 exports = module.exports = {};
 
 const
-	_ = require('underscore'),
 	moment = require('moment'),
 	patterns = {
 		Date: value => /^[19]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(value),
@@ -50,103 +49,122 @@ class DateAndTime extends require('./data-type').DataType {
 		]);
 	}
 
-	getStrictDateAndTimeTransformer(format) {
-		return [
-			value => {
-				if(!this.validate(value)) {
-					throw new TypeError(value);
+	getCommonTransformers() {
+		const transformers = [];
+
+		if(this.options.strictMode) {
+			transformers.push(value => {
+				if(!this.validate(value.value())) {
+					throw new TypeError(value.value());
 				}
 
 				return value;
-			},
-			value => {
-				if(Number.isInteger(value) && (value + '').length <= 10) {
-					value *= 1000;
-				}
+			});
+		}
 
-				return moment(value).format(format);
+		transformers.push(value => {
+			if(Number.isInteger(value.value()) && (value.value() + '').length <= 10) {
+				return value
+					.value(moment(value.value() * 1000).format(this.options.dateFormat))
+					.resolve();
 			}
-		];
-	}
 
-	getNonStrictDateAndTimeTransformer(format) {
-		return [
-			value => {
-				if(Number.isInteger(value) && (value + '').length <= 10) {
-					value *= 1000;
+			return value;
+		});
+
+		if(!this.options.strictMode) {
+			transformers.push(value => {
+				if(!this.validate(value.value(), true)) {
+					return value
+						.value('0')
+						.resolve();
 				}
 
 				return value;
-			},
-			value => {
-				if(this.validate(value, true)) {
-					return moment(value).format(format);
-				} else {
-					return '0';
-				}
-			}
-		];
-	}
+			});
+		}
 
-	getDateAndTimeTransformer(format) {
-		return this.options.strictMode ? this.getStrictDateAndTimeTransformer(format) : this.getNonStrictDateAndTimeTransformer(format);
+		transformers.push(value => {
+			return value
+				.value(moment(value.value()).format(this.options.dateFormat))
+				.resolve();
+		});
+
+		return transformers;
 	}
 };
 
 exports.Date = class extends DateAndTime {
-	constructor({ strictMode = true} = {}) {
-		super({ strictMode });
-		this.addValidator(value => patterns.Date(value));
-		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD'));
+	constructor({ strictMode = true } = {}) {
+		super({
+			strictMode: strictMode,
+		 	dateFormat: 'YYYY-MM-DD'
+		});
+		this.addValidator(value => typeof value === 'string' && patterns.Date(value));
+		this.addTransformer(this.getCommonTransformers());
 	}
 };
 
 exports.Time = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
-		super({ strictMode });
-		this.addValidator(value => patterns.Time(value));
-		this.addTransformer(value => {
-			// 시간 패턴과 일치한다면 년월일을 임의로 붙여
-			// Date 객체로 만든다.
-			if(typeof value === 'string' && patterns.Time(value)) {
-				value = new Date(`1970-01-01 ${value}`);
-			}
-
-			return value;
+		super({
+			strictMode: strictMode,
+		 	dateFormat: 'HH:mm:ss'
 		});
-		this.addTransformer(this.getDateAndTimeTransformer('HH:mm:ss'));
+		this.addValidator(value => typeof value === 'string' && patterns.Time(value));
+		this
+			.addTransformer(value => {
+				// 시간 패턴과 일치한다면 년월일을 임의로 붙여
+				// Date 객체로 만든다.
+				if(typeof value.value() === 'string' && patterns.Time(value.value())) {
+					value.value(new Date(`1970-01-01 ${value.value()}`));
+				}
+
+				return value;
+			})
+			.addTransformer(this.getCommonTransformers());
 	}
 };
 
 exports.Datetime = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
-		super({ strictMode });
-		this.addValidator(value => patterns.Datetime(value));
-		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD HH:mm:ss'));
+		super({
+			strictMode: strictMode,
+		 	dateFormat: 'YYYY-MM-DD HH:mm:ss'
+		});
+		this.addValidator(value => typeof value === 'string' && patterns.Datetime(value));
+		this.addTransformer(this.getCommonTransformers());
 	}
 };
 
 exports.Timestamp = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
-		super({ strictMode });
-		this.addValidator(value => patterns.Timestamp(value));
-		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD HH:mm:ss'));
+		super({
+			strictMode: strictMode,
+		 	dateFormat: 'YYYY-MM-DD HH:mm:ss'
+		});
+		this.addValidator(value => typeof value === 'string' && patterns.Timestamp(value));
+		this.addTransformer(this.getCommonTransformers());
 	}
 };
 
 exports.Year = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
-		super({ strictMode });
-		this.addValidator(value => patterns.Year(value));
-		this.addTransformer(value => {
-			// 년 패턴과 일치한다면 월일을 임의로 붙여
-			// Date 객체로 만든다.
-			if(typeof value === 'string' && patterns.Year(value)) {
-				value = new Date(`${value}-01-01`);
-			}
-
-			return value;
+		super({
+			strictMode: strictMode,
+		 	dateFormat: 'YYYY'
 		});
-		this.addTransformer(this.getDateAndTimeTransformer('YYYY'));
+		this.addValidator(value => typeof value === 'string' && patterns.Year(value));
+		this
+			.addTransformer(value => {
+				// 년 패턴과 일치한다면 월일을 임의로 붙여
+				// Date 객체로 만든다.
+				if(typeof value === 'string' && patterns.Year(value.value())) {
+					value.value(new Date(`${value.value()}-01-01`));
+				}
+
+				return value;
+			})
+			.addTransformer(this.getCommonTransformers());
 	}
 };

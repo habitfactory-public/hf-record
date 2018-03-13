@@ -12,7 +12,8 @@ describe('date-and-time.js', () => {
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
-					strictMode: true
+					strictMode: true,
+					dateFormat: 'YYYY-MM-DD'
 				});
 			});
 
@@ -104,7 +105,8 @@ describe('date-and-time.js', () => {
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
-					strictMode: false
+					strictMode: false,
+					dateFormat: 'YYYY-MM-DD'
 				});
 			});
 
@@ -198,7 +200,8 @@ describe('date-and-time.js', () => {
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
-					strictMode: true
+					strictMode: true,
+					dateFormat: 'HH:mm:ss'
 				});
 			});
 
@@ -282,7 +285,8 @@ describe('date-and-time.js', () => {
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
-					strictMode: false
+					strictMode: false,
+					dateFormat: 'HH:mm:ss'
 				});
 			});
 
@@ -368,7 +372,8 @@ describe('date-and-time.js', () => {
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
-					strictMode: true
+					strictMode: true,
+					dateFormat: 'YYYY-MM-DD HH:mm:ss'
 				});
 			});
 
@@ -452,7 +457,8 @@ describe('date-and-time.js', () => {
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
-					strictMode: false
+					strictMode: false,
+					dateFormat: 'YYYY-MM-DD HH:mm:ss'
 				});
 			});
 
@@ -538,7 +544,8 @@ describe('date-and-time.js', () => {
 
  			it('checks default values', () => {
  				assert.deepEqual(dt.options, {
- 					strictMode: true
+ 					strictMode: true,
+					dateFormat: 'YYYY-MM-DD HH:mm:ss'
  				});
  			});
 
@@ -623,7 +630,8 @@ describe('date-and-time.js', () => {
 
  			it('checks default values', () => {
  				assert.deepEqual(dt.options, {
- 					strictMode: false
+ 					strictMode: false,
+					dateFormat: 'YYYY-MM-DD HH:mm:ss'
  				});
  			});
 
@@ -709,7 +717,8 @@ describe('date-and-time.js', () => {
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
-					strictMode: true
+					strictMode: true,
+					dateFormat: 'YYYY'
 				});
 			});
 
@@ -817,7 +826,8 @@ describe('date-and-time.js', () => {
 
 			it('checks default values', () => {
 				assert.deepEqual(dt.options, {
-					strictMode: false
+					strictMode: false,
+					dateFormat: 'YYYY'
 				});
 			});
 

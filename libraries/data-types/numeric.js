@@ -30,6 +30,11 @@ exports = module.exports = {};
 class Numeric extends require('./data-type').DataType {
 	constructor(options = {}) {
 		super(options);
+		this.addValidator((() => {
+			const { MIN, MAX } = this.getRanges();
+			return value => Number.isInteger(value) && value >= MIN && value <= MAX;
+		})());
+		this.addTransformer(this.getCommonTransformers());
 	}
 
 	getRanges() {
@@ -46,47 +51,43 @@ class Numeric extends require('./data-type').DataType {
 		}
 	}
 
-	getRangeValidator() {
-		const { MIN, MAX } = this.getRanges();
-
-		return value => Number.isInteger(value) && value >= MIN && value <= MAX;
-	}
-
-	getStrictNumericTransformer() {
-		return value => {
-			if(!this.validate(value)) {
-				throw new TypeError(value);
-			}
-
-			return value;
-		};
-	}
-
-	getNonStrictNumericTransformer() {
+	getCommonTransformers() {
 		const
+			transformers = [],
 			isNumeric = value => /^[0-9]+$/.test(value),
 			{ MIN, MAX } = this.getRanges();
 
-		return [
-			value => {
-				if(typeof value === 'string' && isNumeric(value)) {
-					value = value * 1;
+		if(this.options.strictMode) {
+			transformers.push(value => {
+				if(!this.validate(value.value())) {
+					throw new TypeError(value.value());
 				}
 
-				return value;
-			},
-			value => {
-				if(Number.isInteger(value)) {
-					return Math.min(Math.max(value, MIN), MAX);
-				} else {
-					return 0;
-				}
+				return value.resolve();
+			});
+		}
+
+		transformers.push(value => {
+			if(typeof value.value() === 'string' && isNumeric(value.value())) {
+				return value.value(value.value() * 1);
 			}
-		];
-	}
 
-	getNumericTransformer() {
-		return this.options.strictMode ? this.getStrictNumericTransformer() : this.getNonStrictNumericTransformer();
+			return value;
+		});
+
+		transformers.push(value => {
+			if(Number.isInteger(value.value())) {
+				return value
+					.value(Math.min(Math.max(value.value(), MIN), MAX))
+					.resolve();
+			}
+
+			return value
+				.value(0)
+				.resolve();
+		});
+
+		return transformers;
 	}
 }
 
@@ -102,8 +103,6 @@ exports.TinyInt = class extends Numeric {
 				UNSIGNED_MAX: 255
 			}
 		});
-		this.addValidator(this.getRangeValidator());
-		this.addTransformer(this.getNumericTransformer());
 	}
 };
 
@@ -119,8 +118,6 @@ exports.SmallInt = class extends Numeric {
 				UNSIGNED_MAX: 65535
 			}
 		});
-		this.addValidator(this.getRangeValidator());
-		this.addTransformer(this.getNumericTransformer());
 	}
 };
 
@@ -136,8 +133,6 @@ exports.MediumInt = class extends Numeric {
 				UNSIGNED_MAX: 16777215
 			}
 		});
-		this.addValidator(this.getRangeValidator());
-		this.addTransformer(this.getNumericTransformer());
 	}
 };
 
@@ -153,8 +148,6 @@ exports.Int = class extends Numeric {
 				UNSIGNED_MAX: 4294967295
 			}
 		});
-		this.addValidator(this.getRangeValidator());
-		this.addTransformer(this.getNumericTransformer());
 	}
 };
 
@@ -175,7 +168,5 @@ exports.BigInt = class extends Numeric {
 				UNSIGNED_MAX: Number.MAX_SAFE_INTEGER
 			}
 		});
-		this.addValidator(this.getRangeValidator());
-		this.addTransformer(this.getNumericTransformer());
 	}
 };

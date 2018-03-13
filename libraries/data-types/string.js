@@ -36,50 +36,39 @@ class String extends require('./data-type').DataType {
 	constructor(options = {}) {
 		super(options);
 		this.addValidator(value => value === null);
+		if(this.options.strictMode) {
+			this.addTransformer(value => {
+				if(!this.validate(value.value())) {
+					throw new TypeError(value.value());
+				}
+
+				return value;
+			});
+		}
 	}
 
-	getStrictStringTransformer() {
-		return [
-			value => {
-				if(!this.validate(value)) {
-					throw new TypeError(value);
-				}
+	getCommonTransformers() {
+		const transformers = [];
 
-				return value;
-			},
-			value => {
-				if(Number.isInteger(value)) {
-					value += '';
-				}
+		transformers.push(value => {
+			if(Number.isInteger(value.value())) {
+				value.value(value.value() + '');
+			}
 
-				return value;
-			},
-			value => rtrim(value)
-		];
-	}
+			return value;
+		});
 
-	getNonStrictStringTransformer() {
-		return [
-			value => {
-				if(Number.isInteger(value)) {
-					value += '';
-				}
+		transformers.push(value => {
+			return value.value().length > this.options.length ?
+			 	value
+					.value(rtrim(value.value().substr(0, this.options.length)))
+					.resolve() :
+				value
+					.value(rtrim(value.value()))
+					.resolve();
+		});
 
-				return value;
-			},
-			value => {
-				if(value.length > this.options.length) {
-					value = value.substr(0, this.options.length);
-				}
-
-				return value;
-			},
-			value => rtrim(value)
-		];
-	}
-
-	getStringTransformer() {
-		return this.options.strictMode ? this.getStrictStringTransformer() : this.getNonStrictStringTransformer();
+		return transformers;
 	}
 }
 
@@ -90,7 +79,7 @@ exports.Char = class extends String {
 			value => typeof value === 'string' && rtrim(value).length <= this.options.length,
 			value => Number.isInteger(value) && (value + '').length <= this.options.length,
 		]);
-		this.addTransformer(this.getStringTransformer());
+		this.addTransformer(this.getCommonTransformers());
 	}
 };
 
@@ -101,7 +90,7 @@ exports.Varchar = class extends String {
 			value => typeof value === 'string' && rtrim(value).length <= this.options.length,
 			value => Number.isInteger(value) && (value + '').length <= this.options.length,
 		]);
-		this.addTransformer(this.getStringTransformer());
+		this.addTransformer(this.getCommonTransformers());
 	}
 };
 
@@ -147,45 +136,35 @@ exports.Enum = class extends String {
 			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
 			value => typeof value === 'string' && this.options.values.values.has(value)
 		]);
-
-		if(strictMode) {
-			this.addTransformer([
-				value => {
-					if(!this.validate(value)) {
-						throw new TypeError(value);
-					}
-
-					return value;
-				},
-				value => {
-					if(Number.isInteger(value)) {
-						return this.options.values.keys.get(value);
-					} else {
-						return value;
-					}
+		this.addTransformer([
+			value => {
+				if(value.value() === null) {
+					return value
+						.value(null)
+						.resolve();
 				}
-			]);
-		} else {
-			this.addTransformer([
-				value => {
-					const values = this.options.values;
 
-					if(value === null) {
-						return null;
-					}
-
-					if(Number.isInteger(value) && values.keys.has(value)) {
-						return values.keys.get(value);
-					}
-
-					if(typeof value === 'string' && values.values.has(value)) {
-						return value;
-					}
-
-					return '';
+				return value;
+			},
+			value => {
+				if(Number.isInteger(value.value()) && this.options.values.keys.has(value.value())) {
+					return value
+						.value(this.options.values.keys.get(value.value()))
+						.resolve();
 				}
-			]);
-		}
+
+				return value;
+			},
+			value => {
+				if(typeof value.value() === 'string' && this.options.values.values.has(value.value())) {
+					return value.resolve();
+				}
+
+				return value
+					.value('')
+					.resolve();
+			}
+		]);
 	}
 };
 
@@ -260,55 +239,39 @@ exports.Set = class extends String {
 			value => Number.isInteger(value) && value > 0 && this.options.values.isUnderMaxDecimalValue(value),
 			value => (typeof value === 'string' || Array.isArray(value)) && this.options.values.includes(value)
 		]);
-
-		if(strictMode) {
-			this.addTransformer([
-				value => {
-					if(!this.validate(value)) {
-						throw new TypeError(value);
-					}
-
-					return value;
-				},
-				value => {
-					const values = this.options.values;
-
-					if(value === null) {
-						return null;
-					}
-
-					if(Number.isInteger(value) && value > 0 && values.isUnderMaxDecimalValue(value)) {
-						return values.decimalValueToItems(value);
-					}
-
-					if((typeof value === 'string' || Array.isArray(value)) && values.includes(value)) {
-						return value;
-					}
-
-					throw new TypeError(value);
+		this.addTransformer([
+			value => {
+				if(value.value() === null) {
+					return value
+						.value(null)
+						.resolve();
 				}
-			]);
-		} else {
-			this.addTransformer([
-				value => {
-					const values = this.options.values;
 
-					if(value === null) {
-						return null;
-					}
-
-					if(Number.isInteger(value) && value > 0 && values.isUnderMaxDecimalValue(value)) {
-						return values.decimalValueToItems(value);
-					}
-
-					if((typeof value === 'string' || Array.isArray(value)) && values.includes(value)) {
-						return value;
-					}
-
-					return '';
+				return value;
+			},
+			value => {
+				if(Number.isInteger(value.value()) && value.value() > 0 && this.options.values.isUnderMaxDecimalValue(value.value())) {
+					return value
+						.value(this.options.values.decimalValueToItems(value.value()))
+						.resolve();
 				}
-			]);
-		}
+
+				return value;
+			},
+			value => {
+				if((typeof value.value() === 'string' || Array.isArray(value.value())) && this.options.values.includes(value.value())) {
+					return value.resolve();
+				}
+
+				if(this.options.strictMode) {
+					throw new TypeError(value.value());
+				}
+
+				return value
+					.value('')
+					.resolve();
+			}
+		]);
 	}
 };
 
@@ -322,7 +285,7 @@ exports.TinyText = class extends String {
 			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
 			value => typeof value === 'string' && values.values.has(value)
 		]);
-		this.addTransformer(this.getStringTransformer());
+		this.addTransformer(this.getCommonTransformers());
 	}
 };
 
@@ -336,7 +299,7 @@ exports.Text = class extends String {
 			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
 			value => typeof value === 'string' && values.values.has(value)
 		]);
-		this.addTransformer(this.getStringTransformer());
+		this.addTransformer(this.getCommonTransformers());
 	}
 };
 
@@ -350,7 +313,7 @@ exports.MediumText = class extends String {
 			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
 			value => typeof value === 'string' && values.values.has(value)
 		]);
-		this.addTransformer(this.getStringTransformer());
+		this.addTransformer(this.getCommonTransformers());
 	}
 };
 
@@ -364,6 +327,6 @@ exports.LongText = class extends String {
 			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
 			value => typeof value === 'string' && values.values.has(value)
 		]);
-		this.addTransformer(this.getStringTransformer());
+		this.addTransformer(this.getCommonTransformers());
 	}
 };

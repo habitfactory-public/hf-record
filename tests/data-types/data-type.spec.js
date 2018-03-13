@@ -71,10 +71,12 @@ describe('data-type.js', () => {
 
 			dataType.addTransformer([
 				value => {
-					return `inside ${value} inside`;
+					return value.value(`inside ${value.value()} inside`);
 				},
 				value => {
-					return `outside ${value} outside`;
+					return value
+						.value(`outside ${value.value()} outside`)
+						.resolve();
 				}
 			]);
 
