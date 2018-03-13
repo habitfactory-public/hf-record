@@ -30,7 +30,6 @@ exports = module.exports = {};
 class Numeric extends require('./data-type').DataType {
 	constructor(options = {}) {
 		super(options);
-		this.addValidator(value => Number.isInteger(value));
 	}
 
 	getRanges() {
@@ -50,7 +49,7 @@ class Numeric extends require('./data-type').DataType {
 	getRangeValidator() {
 		const { MIN, MAX } = this.getRanges();
 
-		return value => value >= MIN && value <= MAX;
+		return value => Number.isInteger(value) && value >= MIN && value <= MAX;
 	}
 
 	getStrictNumericTransformer() {

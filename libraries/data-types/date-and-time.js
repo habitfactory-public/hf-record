@@ -44,12 +44,10 @@ const
 class DateAndTime extends require('./data-type').DataType {
 	constructor(options = {}) {
 		super(options);
-	}
-
-	getPatternValidator(patternTester) {
-		return value => {
-			return value instanceof Date || (Number.isInteger(value) && value >= 0) || (typeof value === 'string' && patternTester(value));
-		};
+		this.addValidator([
+			value => value instanceof Date,
+			value => Number.isInteger(value) && value >= 0
+		]);
 	}
 
 	getStrictDateAndTimeTransformer(format) {
@@ -98,7 +96,7 @@ class DateAndTime extends require('./data-type').DataType {
 exports.Date = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
 		super({ strictMode });
-		this.addValidator(this.getPatternValidator(patterns.Date));
+		this.addValidator(value => patterns.Date(value));
 		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD'));
 	}
 };
@@ -106,7 +104,7 @@ exports.Date = class extends DateAndTime {
 exports.Time = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
 		super({ strictMode });
-		this.addValidator(this.getPatternValidator(patterns.Time));
+		this.addValidator(value => patterns.Time(value));
 		this.addTransformer(value => {
 			// 시간 패턴과 일치한다면 년월일을 임의로 붙여
 			// Date 객체로 만든다.
@@ -123,7 +121,7 @@ exports.Time = class extends DateAndTime {
 exports.Datetime = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
 		super({ strictMode });
-		this.addValidator(this.getPatternValidator(patterns.Datetime));
+		this.addValidator(value => patterns.Datetime(value));
 		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD HH:mm:ss'));
 	}
 };
@@ -131,7 +129,7 @@ exports.Datetime = class extends DateAndTime {
 exports.Timestamp = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
 		super({ strictMode });
-		this.addValidator(this.getPatternValidator(patterns.Timestamp));
+		this.addValidator(value => patterns.Timestamp(value));
 		this.addTransformer(this.getDateAndTimeTransformer('YYYY-MM-DD HH:mm:ss'));
 	}
 };
@@ -139,7 +137,7 @@ exports.Timestamp = class extends DateAndTime {
 exports.Year = class extends DateAndTime {
 	constructor({ strictMode = true} = {}) {
 		super({ strictMode });
-		this.addValidator(this.getPatternValidator(patterns.Year));
+		this.addValidator(value => patterns.Year(value));
 		this.addTransformer(value => {
 			// 년 패턴과 일치한다면 월일을 임의로 붙여
 			// Date 객체로 만든다.

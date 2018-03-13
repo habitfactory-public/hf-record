@@ -35,17 +35,7 @@ const rtrim = string => {
 class String extends require('./data-type').DataType {
 	constructor(options = {}) {
 		super(options);
-		this.addValidator(value => Number.isInteger(value) || typeof value === 'string' || value === null || Array.isArray(value));
-	}
-
-	getLengthValidator() {
-		return value => {
-			if(Number.isInteger(value)) {
-				value += '';
-			}
-
-			return rtrim(value).length <= this.options.length;
-		};
+		this.addValidator(value => value === null);
 	}
 
 	getStrictStringTransformer() {
@@ -96,7 +86,10 @@ class String extends require('./data-type').DataType {
 exports.Char = class extends String {
 	constructor({ strictMode = true, length = 255} = {}) {
 		super({ strictMode, length });
-		this.addValidator(this.getLengthValidator());
+		this.addValidator([
+			value => typeof value === 'string' && rtrim(value).length <= this.options.length,
+			value => Number.isInteger(value) && (value + '').length <= this.options.length,
+		]);
 		this.addTransformer(this.getStringTransformer());
 	}
 };
@@ -104,7 +97,10 @@ exports.Char = class extends String {
 exports.Varchar = class extends String {
 	constructor({ strictMode = true, length = 21844} = {}) {
 		super({ strictMode, length });
-		this.addValidator(this.getLengthValidator());
+		this.addValidator([
+			value => typeof value === 'string' && rtrim(value).length <= this.options.length,
+			value => Number.isInteger(value) && (value + '').length <= this.options.length,
+		]);
 		this.addTransformer(this.getStringTransformer());
 	}
 };
@@ -147,23 +143,10 @@ exports.Enum = class extends String {
 			strictMode: strictMode,
 			values: new Enumerable({ strictMode, values })
 		});
-		this.addValidator(value => {
-			const values = this.options.values;
-
-			if(value === null) {
-				return true;
-			}
-
-			if(Number.isInteger(value) && values.keys.has(value)) {
-				return true;
-			}
-
-			if(typeof value === 'string' && values.values.has(value)) {
-				return true;
-			}
-
-			return false;
-		});
+		this.addValidator([
+			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
+			value => typeof value === 'string' && this.options.values.values.has(value)
+		]);
 
 		if(strictMode) {
 			this.addTransformer([
@@ -273,24 +256,10 @@ exports.Set = class extends String {
 			strictMode: strictMode,
 			values: new Settable({ strictMode, values })
 		});
-		this.addValidator(value => {
-			const values = this.options.values;
-
-			if(value === null) {
-				return true;
-			}
-
-			// 정수라면 최대 인덱스 (2의 N승) 이내여야 함.
-			if(Number.isInteger(value) && value > 0 && values.isUnderMaxDecimalValue(value)) {
-				return true;
-			}
-
-			if((typeof value === 'string' || Array.isArray(value)) && values.includes(value)) {
-				return true;
-			}
-
-			return false;
-		});
+		this.addValidator([
+			value => Number.isInteger(value) && value > 0 && this.options.values.isUnderMaxDecimalValue(value),
+			value => (typeof value === 'string' || Array.isArray(value)) && this.options.values.includes(value)
+		]);
 
 		if(strictMode) {
 			this.addTransformer([
@@ -349,7 +318,10 @@ exports.TinyText = class extends String {
 			strictMode: strictMode,
 		 	length: 255
 		});
-		this.addValidator(this.getLengthValidator());
+		this.addValidator([
+			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
+			value => typeof value === 'string' && values.values.has(value)
+		]);
 		this.addTransformer(this.getStringTransformer());
 	}
 };
@@ -360,7 +332,10 @@ exports.Text = class extends String {
 			strictMode: strictMode,
 		 	length: 65535
 		});
-		this.addValidator(this.getLengthValidator());
+		this.addValidator([
+			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
+			value => typeof value === 'string' && values.values.has(value)
+		]);
 		this.addTransformer(this.getStringTransformer());
 	}
 };
@@ -371,7 +346,10 @@ exports.MediumText = class extends String {
 			strictMode: strictMode,
 		 	length: 16777215
 		});
-		this.addValidator(this.getLengthValidator());
+		this.addValidator([
+			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
+			value => typeof value === 'string' && values.values.has(value)
+		]);
 		this.addTransformer(this.getStringTransformer());
 	}
 };
@@ -382,7 +360,10 @@ exports.LongText = class extends String {
 			strictMode: strictMode,
 		 	length: 4294967295
 		});
-		this.addValidator(this.getLengthValidator());
+		this.addValidator([
+			value => Number.isInteger(value) && value > 0 && this.options.values.keys.has(value),
+			value => typeof value === 'string' && values.values.has(value)
+		]);
 		this.addTransformer(this.getStringTransformer());
 	}
 };

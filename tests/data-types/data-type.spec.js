@@ -40,33 +40,43 @@ describe('data-type.js', () => {
 		describe('Validator', () => {
 			const dataType = new DataType();
 
-			dataType
-				.addValidator(value => {
-					return value <= 20;
-				})
-				.addValidator(value => {
-					return value <= 10;
-				});
+			dataType.addValidator([
+				value => {
+					return value <= 20 && value >= 10;
+				},
+				value => {
+					return value === '가';
+				}
+			]);
 
 			it('validates 5', () => {
-				assert.isTrue(dataType.validate(5));
+				assert.isFalse(dataType.validate(5));
 			});
 
 			it('validates 15', () => {
-				assert.isFalse(dataType.validate(15));
+				assert.isTrue(dataType.validate(15));
+			});
+
+			it('validates "가"', () => {
+				assert.isTrue(dataType.validate('가'));
+			});
+
+			it('validates "나"', () => {
+				assert.isFalse(dataType.validate('나'));
 			});
 		});
 
 		describe('Transformer', () => {
 			const dataType = new DataType();
 
-			dataType
-				.addTransformer(value => {
+			dataType.addTransformer([
+				value => {
 					return `inside ${value} inside`;
-				})
-				.addTransformer(value => {
+				},
+				value => {
 					return `outside ${value} outside`;
-				});
+				}
+			]);
 
 			it('transforms "value" into "outside inside value inside outside"', () => {
 				assert.equal(dataType.transform('value'), 'outside inside value inside outside');

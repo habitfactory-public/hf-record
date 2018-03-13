@@ -1,16 +1,13 @@
-const _ = require('underscore');
-
 class DataType {
 	constructor(options = {}) {
-		this.options = _.defaults(options, {
-			strictMode: true
-		});
+		options.strictMode = options.strictMode === undefined ? true : options.strictMode;
+		this.options = options;
 		this.validators = [];
 		this.transformers = [];
 	}
 
 	addValidator(validator) {
-		if(_.isArray(validator)) {
+		if(Array.isArray(validator)) {
 			this.validators = this.validators.concat(validator);
 		} else {
 			this.validators.push(validator);
@@ -20,7 +17,7 @@ class DataType {
 	}
 
 	addTransformer(transformer) {
-		if(_.isArray(transformer)) {
+		if(Array.isArray(transformer)) {
 			this.transformers = this.transformers.concat(transformer);
 		} else {
 			this.transformers.push(transformer);
@@ -35,8 +32,7 @@ class DataType {
 		}
 
 		return this.validators
-			.reverse()
-			.every(validator => {
+			.some(validator => {
 				return validator(value);
 			});
 	}
