@@ -34,12 +34,11 @@ class DataType {
 			return true;
 		}
 
-		return _.chain(this.validators)
+		return this.validators
 			.reverse()
 			.every(validator => {
 				return validator(value);
-			})
-			.value();
+			});
 	}
 
 	transform(value) {
@@ -47,11 +46,10 @@ class DataType {
 			return value;
 		}
 
-		return _.chain(this.transformers)
+		return this.transformers
 			.reduce((accumulator, transformer) => {
 				return transformer(accumulator);
-			}, value)
-			.value();
+			}, value);
 	}
 }
 
