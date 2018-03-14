@@ -1,6 +1,6 @@
 const
 	assert = require('chai').assert,
-	{ DataTypeFactory } = require('../../libraries/data-types/data-type');
+	{ DataTypeFactory } = require('../libraries/data-types/data-type');
 
 // char length 0 - 255 (765byte)
 // varchar length 0 - 21845 (65535byte)

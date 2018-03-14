@@ -1,7 +1,7 @@
 const
 	assert = require('chai').assert,
 	moment = require('moment'),
-	{ DataTypeFactory } = require('../../libraries/data-types/data-type');
+	{ DataTypeFactory } = require('../libraries/data-types/data-type');
 
 describe('date-and-time.js', () => {
 	// TODO

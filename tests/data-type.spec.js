@@ -1,9 +1,9 @@
 const
 	assert = require('chai').assert,
-	{ DataType, DataTypeFactory } = require('../../libraries/data-types/data-type'),
-	DateAndTimeType = require('../../libraries/data-types/date-and-time'),
-	NumericType = require('../../libraries/data-types/numeric'),
-	StringType = require('../../libraries/data-types/string');
+	{ DataType, DataTypeFactory } = require('../libraries/data-types/data-type'),
+	DateAndTimeType = require('../libraries/data-types/date-and-time'),
+	NumericType = require('../libraries/data-types/numeric'),
+	StringType = require('../libraries/data-types/string');
 
 describe('data-type.js', () => {
 	describe('DataType', () => {

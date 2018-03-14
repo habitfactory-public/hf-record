@@ -1,7 +1,7 @@
 const
 	_ = require('underscore'),
 	assert = require('chai').assert,
-	{ DataTypeFactory } = require('../../libraries/data-types/data-type'),
+	{ DataTypeFactory } = require('../libraries/data-types/data-type'),
 
 	// 참조 https://dev.mysql.com/doc/refman/5.7/en/integer-types.html
 	numericDataTypeInfos = {
