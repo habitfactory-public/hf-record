@@ -74,7 +74,10 @@ class String extends require('./data-type').DataType {
 
 exports.Char = class extends String {
 	constructor({ strictMode = true, length = 255} = {}) {
-		super({ strictMode, length });
+		super({
+			strictMode: strictMode,
+			length: Math.max(Math.min(length, 255), 0)
+		});
 		this.addValidator([
 			value => typeof value === 'string' && rtrim(value).length <= this.options.length,
 			value => Number.isInteger(value) && (value + '').length <= this.options.length,
@@ -85,7 +88,10 @@ exports.Char = class extends String {
 
 exports.Varchar = class extends String {
 	constructor({ strictMode = true, length = 21844} = {}) {
-		super({ strictMode, length });
+		super({
+			strictMode: strictMode,
+			length: Math.max(Math.min(length, 21844), 0)
+		});
 		this.addValidator([
 			value => typeof value === 'string' && rtrim(value).length <= this.options.length,
 			value => Number.isInteger(value) && (value + '').length <= this.options.length,
