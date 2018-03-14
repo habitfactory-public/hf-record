@@ -106,7 +106,7 @@ exports.Date = class extends DateAndTime {
 };
 
 exports.Time = class extends DateAndTime {
-	constructor({ strictMode = true} = {}) {
+	constructor({ strictMode = true } = {}) {
 		super({
 			strictMode: strictMode,
 		 	dateFormat: 'HH:mm:ss'
@@ -127,7 +127,7 @@ exports.Time = class extends DateAndTime {
 };
 
 exports.Datetime = class extends DateAndTime {
-	constructor({ strictMode = true} = {}) {
+	constructor({ strictMode = true } = {}) {
 		super({
 			strictMode: strictMode,
 		 	dateFormat: 'YYYY-MM-DD HH:mm:ss'
@@ -138,7 +138,7 @@ exports.Datetime = class extends DateAndTime {
 };
 
 exports.Timestamp = class extends DateAndTime {
-	constructor({ strictMode = true} = {}) {
+	constructor({ strictMode = true } = {}) {
 		super({
 			strictMode: strictMode,
 		 	dateFormat: 'YYYY-MM-DD HH:mm:ss'
@@ -149,7 +149,7 @@ exports.Timestamp = class extends DateAndTime {
 };
 
 exports.Year = class extends DateAndTime {
-	constructor({ strictMode = true} = {}) {
+	constructor({ strictMode = true } = {}) {
 		super({
 			strictMode: strictMode,
 		 	dateFormat: 'YYYY'
@@ -159,7 +159,7 @@ exports.Year = class extends DateAndTime {
 			.addTransformer(value => {
 				// 년 패턴과 일치한다면 월일을 임의로 붙여
 				// Date 객체로 만든다.
-				if(typeof value === 'string' && patterns.Year(value.value())) {
+				if(typeof value.value() === 'string' && patterns.Year(value.value())) {
 					value.value(new Date(`${value.value()}-01-01`));
 				}
 
