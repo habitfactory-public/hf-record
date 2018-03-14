@@ -1,3 +1,5 @@
+exports = module.exports = {};
+
 class Transformed {
 	constructor(value) {
 		this._value = value;
@@ -6,7 +8,6 @@ class Transformed {
 
 	resolve() {
 		this._resolved = true;
-
 		return this;
 	}
 
@@ -24,7 +25,7 @@ class Transformed {
 	}
 }
 
-class DataType {
+exports.DataType = class {
 	constructor(options = {}) {
 		options.strictMode = options.strictMode === undefined ? true : options.strictMode;
 		this.options = options;
@@ -78,24 +79,22 @@ class DataType {
 			}, new Transformed(value))
 			.value();
 	}
-}
+};
 
-class DataTypeFactory {
+exports.DataTypeFactory = class {
 	static createDataType(file, className, options) {
 		return new (require(file)[className])(options);
 	}
 
 	static createDateAndTime(className, options = {}) {
-		return DataTypeFactory.createDataType('./date-and-time', className, options);
+		return this.createDataType('./date-and-time', className, options);
 	}
 
 	static createNumeric(className, options = {}) {
-		return DataTypeFactory.createDataType('./numeric', className, options);
+		return this.createDataType('./numeric', className, options);
 	}
 
 	static createString(className, options = {}) {
-		return DataTypeFactory.createDataType('./string', className, options);
+		return this.createDataType('./string', className, options);
 	}
-}
-
-module.exports = { DataType, DataTypeFactory };
+};
