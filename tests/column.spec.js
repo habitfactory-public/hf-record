@@ -6,6 +6,7 @@ describe('column.js', () => {
 	describe('Column', () => {
 		describe('Default', () => {
 			const c = ColumnFactory.createColumn('name', 'TinyInt', {
+					isStrictMode: true,
 					isPrimaryKey: false,
 					isNotNull: true,
 					isBinary: false,
@@ -71,6 +72,7 @@ describe('column.js', () => {
 
 		describe('Readonly', () => {
 			const c = ColumnFactory.createColumn('name', 'TinyInt', {
+					isStrictMode: true,
 					isPrimaryKey: false,
 					isNotNull: true,
 					isBinary: false,
@@ -80,6 +82,10 @@ describe('column.js', () => {
 					isMagicColumn:false,
 					length: 4
 				});
+
+			it('isReadonly()', () => {
+				assert.isTrue(c.isReadonly());
+			});
 			
 			it('set(1)', () => {
 				assert.isTrue(c.set(1));
@@ -92,6 +98,36 @@ describe('column.js', () => {
 			it('get()', () => {
 				assert.strictEqual(c.get(), 1);
 			})
+		});
+
+		describe('NotNull', () => {
+			const c = ColumnFactory.createColumn('name', 'TinyInt', {
+					isStrictMode: true,
+					isPrimaryKey: false,
+					isNotNull: true,
+					isBinary: false,
+					isUnsigned: true,
+					isZeroFill: false,
+					isReadonly: true,
+					isMagicColumn:false,
+					length: 4
+				});
+
+			it('isStrictMode()', () => {
+				assert.isTrue(c.isStrictMode());
+			});
+			
+			it('isNotNull()', () => {
+				assert.isTrue(c.isNotNull());
+			});
+
+			it('set(1)', () => {
+				assert.isTrue(c.set(1));
+			});
+
+			it('set(null)', () => {
+				assert.throws(() => c.set(null), TypeError, 'name can\'t be null.');
+			});
 		});
 	});
 });

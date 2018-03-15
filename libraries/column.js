@@ -40,6 +40,7 @@ exports.Column = class Column {
 		this._value = new ColumnValue();
 		this._name = name;
 		this._attributes = Object.assign({}, {
+			isStrictMode: true,
 			isPrimaryKey: false,
 			isNotNull: false,
 			isBinary: false,
@@ -57,6 +58,10 @@ exports.Column = class Column {
 
 	getDataType() {
 		return this._dataType;
+	}
+
+	isStrictMode() {
+		return this._attributes.isStrictMode;
 	}
 
 	isPrimaryKey() {
@@ -88,6 +93,10 @@ exports.Column = class Column {
 	}
 
 	set(value) {
+		if(this.isStrictMode() && this.isNotNull() && value === null) {
+			throw new TypeError(`${this.getName()} can't be null.`);
+		}
+
 		if(this.isReadonly() && this._value.get() !== undefined) {
 			return false;
 		}
