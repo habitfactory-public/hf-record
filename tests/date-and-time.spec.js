@@ -7,13 +7,32 @@ describe('date-and-time.js', () => {
 	// TODO
 	// '1000-01-01' - '9999-12-31' 범위 테스트 추가해야함
 	describe('Date', () => {
-		describe('StrictMode true', () => {
-			const dt = DataTypeFactory.createDateAndTime('Date');
+		describe('isStrictMode true', () => {
+			const dt = DataTypeFactory.createDate();
 
-			it('checks default values', () => {
-				assert.deepEqual(dt.options, {
-					strictMode: true,
-					dateFormat: 'YYYY-MM-DD'
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'YYYY-MM-DD');
 				});
 			});
 
@@ -98,17 +117,36 @@ describe('date-and-time.js', () => {
 			});
 		});
 
-		describe('StrictMode false', () => {
-			const dt = DataTypeFactory.createDateAndTime('Date', {
-					strictMode: false
+		describe('isStrictMode false', () => {
+			const dt = DataTypeFactory.createDate({
+					isStrictMode: false
 				});
 
-			it('checks default values', () => {
-				assert.deepEqual(dt.options, {
-					strictMode: false,
-					dateFormat: 'YYYY-MM-DD'
+				describe('Check default values', () => {
+					it('isStrictMode()', () => {
+						assert.isFalse(dt.isStrictMode());
+					});
+	
+					it('isNotNull()', () => {
+						assert.isFalse(dt.isNotNull());
+					});
+	
+					it('isBinary()', () => {
+						assert.isFalse(dt.isBinary());
+					});
+	
+					it('isUnsigned()', () => {
+						assert.isFalse(dt.isUnsigned());
+					});
+	
+					it('isZeroFill()', () => {
+						assert.isFalse(dt.isZeroFill());
+					});
+	
+					it('getDateFormat()', () => {
+						assert.strictEqual(dt.getDateFormat(), 'YYYY-MM-DD');
+					});
 				});
-			});
 
 			it('transforms "1979-07-07" into "1979-07-07"', () => {
 				assert.strictEqual(dt.transform('1979-07-07'), '1979-07-07');
@@ -195,13 +233,32 @@ describe('date-and-time.js', () => {
 	// TODO
 	// '-838:59:59' - '838:59:59' 범위 체크 추가해야함.
 	describe('Time', () => {
-		describe('StrictMode true', () => {
-			const dt = DataTypeFactory.createDateAndTime('Time');
+		describe('isStrictMode true', () => {
+			const dt = DataTypeFactory.createTime();
 
-			it('checks default values', () => {
-				assert.deepEqual(dt.options, {
-					strictMode: true,
-					dateFormat: 'HH:mm:ss'
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'HH:mm:ss');
 				});
 			});
 
@@ -278,15 +335,34 @@ describe('date-and-time.js', () => {
 			});
 		});
 
-		describe('StrictMode false', () => {
-			const dt = DataTypeFactory.createDateAndTime('Time', {
-					strictMode: false
+		describe('isStrictMode false', () => {
+			const dt = DataTypeFactory.createTime({
+					isStrictMode: false
 				});
 
-			it('checks default values', () => {
-				assert.deepEqual(dt.options, {
-					strictMode: false,
-					dateFormat: 'HH:mm:ss'
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isFalse(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'HH:mm:ss');
 				});
 			});
 
@@ -367,13 +443,32 @@ describe('date-and-time.js', () => {
 	// TODO
 	// '1000-01-01 00:00:00' - '9999-12-31 23:59:59' 범위 체크 추가해야함.
 	describe('Datetime', () => {
-		describe('StrictMode true', () => {
-			const dt = DataTypeFactory.createDateAndTime('Datetime');
+		describe('isStrictMode true', () => {
+			const dt = DataTypeFactory.createDatetime();
 
-			it('checks default values', () => {
-				assert.deepEqual(dt.options, {
-					strictMode: true,
-					dateFormat: 'YYYY-MM-DD HH:mm:ss'
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'YYYY-MM-DD HH:mm:ss');
 				});
 			});
 
@@ -450,15 +545,34 @@ describe('date-and-time.js', () => {
 			});
 		});
 
-		describe('StrictMode false', () => {
-			const dt = DataTypeFactory.createDateAndTime('Datetime', {
-					strictMode: false
+		describe('isStrictMode false', () => {
+			const dt = DataTypeFactory.createDatetime({
+					isStrictMode: false
 				});
 
-			it('checks default values', () => {
-				assert.deepEqual(dt.options, {
-					strictMode: false,
-					dateFormat: 'YYYY-MM-DD HH:mm:ss'
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isFalse(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'YYYY-MM-DD HH:mm:ss');
 				});
 			});
 
@@ -539,15 +653,34 @@ describe('date-and-time.js', () => {
 	// TODO
 	// '1970-01-01 00:00:01' UTC - '2038-01-19 03:14:07' UTC 범위 체크 추가해야함.
 	describe('Timestamp', () => {
- 		describe('StrictMode true', () => {
-			const dt = DataTypeFactory.createDateAndTime('Timestamp');
+ 		describe('isStrictMode true', () => {
+			const dt = DataTypeFactory.createTimestamp();
 
- 			it('checks default values', () => {
- 				assert.deepEqual(dt.options, {
- 					strictMode: true,
-					dateFormat: 'YYYY-MM-DD HH:mm:ss'
- 				});
- 			});
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'YYYY-MM-DD HH:mm:ss');
+				});
+			});
 
  			it('transforms "1979-07-07 12:23:34" into "1979-07-07 12:23:34"', () => {
  				assert.strictEqual(dt.transform('1979-07-07 12:23:34'), '1979-07-07 12:23:34');
@@ -622,18 +755,36 @@ describe('date-and-time.js', () => {
  			});
  		});
 
- 		describe('StrictMode false', () => {
-			const dt = DataTypeFactory.createDateAndTime('Timestamp', {
- 					strictMode: false
+ 		describe('isStrictMode false', () => {
+			const dt = DataTypeFactory.createTimestamp({
+ 					isStrictMode: false
  				});
 
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isFalse(dt.isStrictMode());
+				});
 
- 			it('checks default values', () => {
- 				assert.deepEqual(dt.options, {
- 					strictMode: false,
-					dateFormat: 'YYYY-MM-DD HH:mm:ss'
- 				});
- 			});
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'YYYY-MM-DD HH:mm:ss');
+				});
+			});
 
  			it('transforms "1979-07-07 12:23:34" into "1979-07-07 12:23:34"', () => {
  				assert.strictEqual(dt.transform('1979-07-07 12:23:34'), '1979-07-07 12:23:34');
@@ -712,13 +863,32 @@ describe('date-and-time.js', () => {
 	// TODO
 	// '1901' - '2155' UTC 범위 체크 추가해야함.
 	describe('Year', () => {
-		describe('StrictMode true', () => {
-			const dt = DataTypeFactory.createDateAndTime('Year');
+		describe('isStrictMode true', () => {
+			const dt = DataTypeFactory.createYear();
 
-			it('checks default values', () => {
-				assert.deepEqual(dt.options, {
-					strictMode: true,
-					dateFormat: 'YYYY'
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'YYYY');
 				});
 			});
 
@@ -819,15 +989,34 @@ describe('date-and-time.js', () => {
  			});
 		});
 
-		describe('StrictMode false', () => {
-			const dt = DataTypeFactory.createDateAndTime('Year', {
-					strictMode: false
+		describe('isStrictMode false', () => {
+			const dt = DataTypeFactory.createYear({
+					isStrictMode: false
 				});
 
-			it('checks default values', () => {
-				assert.deepEqual(dt.options, {
-					strictMode: false,
-					dateFormat: 'YYYY'
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isFalse(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
+				});
+
+				it('getDateFormat()', () => {
+					assert.strictEqual(dt.getDateFormat(), 'YYYY');
 				});
 			});
 

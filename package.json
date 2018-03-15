@@ -8,7 +8,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "test": "clear && node_modules/.bin/mocha tests/*.spec.js --color --check-leaks --throw-deprecation --trace-deprecation --reporter dot --bail"
+    "test": "clear && node_modules/.bin/mocha tests/*.spec.js --watch tests/*.spec.js --watch libraries/*.js --watch libraries/**/*.js --color --check-leaks --throw-deprecation --trace-deprecation --bail"
   },
   "devDependencies": {
     "chai": "^4.1.2",

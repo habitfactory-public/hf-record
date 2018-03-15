@@ -1,10 +1,9 @@
 const
-	_ = require('underscore'),
 	assert = require('chai').assert,
 	{ DataTypeFactory } = require('../libraries/data-types/data-type'),
 
 	// 참조 https://dev.mysql.com/doc/refman/5.7/en/integer-types.html
-	numericDataTypeInfos = {
+	NUMERIC_DATATYPE_MAX_RANGES = {
 		TinyInt: {
 			MAX: 128,
 			MIN: -128,
@@ -60,26 +59,39 @@ const
 	};
 
 describe('numeric.js', () => {
-	_.each(numericDataTypeInfos, (value, key) => {
+	for(const [key, value] of Object.entries(NUMERIC_DATATYPE_MAX_RANGES)) {
 		const { MAX, MIN, OVERFLOWED, UNDERFLOWED, UNSIGNED_MAX, UNSIGNED_MIN, UNSIGNED_OVERFLOWED, UNSIGNED_UNDERFLOWED } = value;
 
 		describe(key, () => {
-			describe('strictMode true, isUnsigned false (without options)', () => {
-				const int = DataTypeFactory.createNumeric(key);
+			describe('isStrictMode true, isUnsigned false', () => {
+				const int = DataTypeFactory[`create${key}`]();
 
-				/**
-				 * 공통 테스트
-				 */
-				it('checks default values', () => {
-					assert.deepEqual(int.options, {
-						strictMode: true,
-						isUnsigned: false,
-						ranges: {
+				describe('Check default values', () => {
+					it('isStrictMode()', () => {
+						assert.isTrue(int.isStrictMode());
+					});
+	
+					it('isNotNull()', () => {
+						assert.isFalse(int.isNotNull());
+					});
+	
+					it('isBinary()', () => {
+						assert.isFalse(int.isBinary());
+					});
+	
+					it('isUnsigned()', () => {
+						assert.isFalse(int.isUnsigned());
+					});
+	
+					it('isZeroFill()', () => {
+						assert.isFalse(int.isZeroFill());
+					});
+	
+					it('getDateFormat()', () => {
+						assert.deepEqual(int.getRanges(), {
 							MIN: MIN,
-							MAX: MAX,
-							UNSIGNED_MIN: UNSIGNED_MIN,
-							UNSIGNED_MAX: UNSIGNED_MAX
-						}
+							MAX: MAX
+						});
 					});
 				});
 
@@ -144,22 +156,38 @@ describe('numeric.js', () => {
 				});
 			});
 
-			describe('strictMode false, isUnsigned false', () => {
-				const int = DataTypeFactory.createNumeric(key, {
-						strictMode: false,
+			describe('isStrictMode false, isUnsigned false', () => {
+				const int = DataTypeFactory[`create${key}`]({
+						isStrictMode: false,
 						isUnsigned: false
 					});
 
-				it('checks default values', () => {
-					assert.deepEqual(int.options, {
-						strictMode: false,
-						isUnsigned: false,
-						ranges: {
+				describe('Check default values', () => {
+					it('isStrictMode()', () => {
+						assert.isFalse(int.isStrictMode());
+					});
+	
+					it('isNotNull()', () => {
+						assert.isFalse(int.isNotNull());
+					});
+	
+					it('isBinary()', () => {
+						assert.isFalse(int.isBinary());
+					});
+	
+					it('isUnsigned()', () => {
+						assert.isFalse(int.isUnsigned());
+					});
+	
+					it('isZeroFill()', () => {
+						assert.isFalse(int.isZeroFill());
+					});
+	
+					it('getDateFormat()', () => {
+						assert.deepEqual(int.getRanges(), {
 							MIN: MIN,
-							MAX: MAX,
-							UNSIGNED_MIN: UNSIGNED_MIN,
-							UNSIGNED_MAX: UNSIGNED_MAX
-						}
+							MAX: MAX
+						});
 					});
 				});
 
@@ -224,22 +252,38 @@ describe('numeric.js', () => {
 				});
 			});
 
-			describe('strictMode false, isUnsigned true', () => {
-				const int = DataTypeFactory.createNumeric(key, {
-						strictMode: false,
+			describe('isStrictMode false, isUnsigned true', () => {
+				const int = DataTypeFactory[`create${key}`]({
+						isStrictMode: false,
 						isUnsigned: true
 					});
 
-				it('checks default values', () => {
-					assert.deepEqual(int.options, {
-						strictMode: false,
-						isUnsigned: true,
-						ranges: {
-							MIN: MIN,
-							MAX: MAX,
-							UNSIGNED_MIN: UNSIGNED_MIN,
-							UNSIGNED_MAX: UNSIGNED_MAX
-						}
+				describe('Check default values', () => {
+					it('isStrictMode()', () => {
+						assert.isFalse(int.isStrictMode());
+					});
+	
+					it('isNotNull()', () => {
+						assert.isFalse(int.isNotNull());
+					});
+	
+					it('isBinary()', () => {
+						assert.isFalse(int.isBinary());
+					});
+	
+					it('isUnsigned()', () => {
+						assert.isTrue(int.isUnsigned());
+					});
+	
+					it('isZeroFill()', () => {
+						assert.isFalse(int.isZeroFill());
+					});
+	
+					it('getDateFormat()', () => {
+						assert.deepEqual(int.getRanges(), {
+							MIN: UNSIGNED_MIN,
+							MAX: UNSIGNED_MAX
+						});
 					});
 				});
 
@@ -304,22 +348,38 @@ describe('numeric.js', () => {
 				});
 			});
 
-			describe('strictMode true, isUnsigned true', () => {
-				const int = DataTypeFactory.createNumeric(key, {
-						strictMode: true,
+			describe('isStrictMode true, isUnsigned true', () => {
+				const int = DataTypeFactory[`create${key}`]({
+						isStrictMode: true,
 						isUnsigned: true
 					});
 
-				it('checks default values', () => {
-					assert.deepEqual(int.options, {
-						strictMode: true,
-						isUnsigned: true,
-						ranges: {
-							MIN: MIN,
-							MAX: MAX,
-							UNSIGNED_MIN: UNSIGNED_MIN,
-							UNSIGNED_MAX: UNSIGNED_MAX
-						}
+				describe('Check default values', () => {
+					it('isStrictMode()', () => {
+						assert.isTrue(int.isStrictMode());
+					});
+	
+					it('isNotNull()', () => {
+						assert.isFalse(int.isNotNull());
+					});
+	
+					it('isBinary()', () => {
+						assert.isFalse(int.isBinary());
+					});
+	
+					it('isUnsigned()', () => {
+						assert.isTrue(int.isUnsigned());
+					});
+	
+					it('isZeroFill()', () => {
+						assert.isFalse(int.isZeroFill());
+					});
+	
+					it('getDateFormat()', () => {
+						assert.deepEqual(int.getRanges(), {
+							MIN: UNSIGNED_MIN,
+							MAX: UNSIGNED_MAX
+						});
 					});
 				});
 
@@ -384,5 +444,5 @@ describe('numeric.js', () => {
 				});
 			});
 		});
-	});
+	};
 });

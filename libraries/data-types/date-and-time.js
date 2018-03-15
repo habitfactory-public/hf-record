@@ -11,7 +11,7 @@ const
 	};
 
 /**
- * strictMode가 true
+ * isStrictMode가 true
  * validate는 모든 validator를 반드시 통과해야한다.
  * transform은 validate를 통과하지 못하는 입력값에 대해선 TypeError를 던진다.
  *
@@ -27,9 +27,9 @@ const
  *
  * --->
  *
- * strictMode가 false
+ * isStrictMode가 false
  * validate는 모든 validator를 통과한 것으로 간주하고 true를 반환한다.
- * transform은 validate를 통과하지 못한 (strictMode true인 상황의 validate) 값에 대해선
+ * transform은 validate를 통과하지 못한 (isStrictMode true인 상황의 validate) 값에 대해선
  * 형변환을 시도하지만, 가능하지 않은 경우엔 입력값을 그대로 반환한다.
  *
  * validator는
@@ -41,42 +41,39 @@ const
  * 3. 그 외의 경우는 "0"으로 변환.
  */
 class DateAndTime extends require('./data-type').DataType {
-	constructor(options = {}) {
-		super(options);
-		this.addValidator([
-			value => value instanceof Date,
-			value => Number.isInteger(value) && value >= 0
+	constructor(attributes = {}) {
+		super(attributes);
+		
+		this.appendValidator([
+			value => value.instanceOf(Date),
+			value => value.isGreaterOrEqual(0)
 		]);
-	}
 
-	getCommonTransformers() {
-		const transformers = [];
-
-		if(this.options.strictMode) {
-			transformers.push(value => {
-				if(!this.validate(value.value())) {
-					throw new TypeError(value.value());
+		if(this.isStrictMode()) {
+			this.appendTransformer(value => {
+				if(!this.validate(value)) {
+					throw new TypeError(value.get());
 				}
 
 				return value;
 			});
 		}
 
-		transformers.push(value => {
-			if(Number.isInteger(value.value()) && (value.value() + '').length <= 10) {
+		this.appendTransformer(value => {
+			if(value.isInteger() && value.length <= 10) {
 				return value
-					.value(moment(value.value() * 1000).format(this.options.dateFormat))
+					.set(moment(value.get() * 1000).format(this.getDateFormat()))
 					.resolve();
 			}
 
 			return value;
 		});
 
-		if(!this.options.strictMode) {
-			transformers.push(value => {
-				if(!this.validate(value.value(), true)) {
+		if(!this.isStrictMode()) {
+			this.appendTransformer(value => {
+				if(!this.validate(value, true)) {
 					return value
-						.value('0')
+						.set('0')
 						.resolve();
 				}
 
@@ -84,87 +81,90 @@ class DateAndTime extends require('./data-type').DataType {
 			});
 		}
 
-		transformers.push(value => {
+		this.appendTransformer(value => {
 			return value
-				.value(moment(value.value()).format(this.options.dateFormat))
+				.set(moment(value.get()).format(this.getDateFormat()))
 				.resolve();
 		});
+	}
 
-		return transformers;
+	getDateFormat() {
+		return this._attributes.dateFormat;
 	}
 };
 
-exports.Date = class extends DateAndTime {
-	constructor({ strictMode = true } = {}) {
+// 자바스크립트 Date 클래스와 구분하기 위해
+exports.Date = class Date_ extends DateAndTime {
+	constructor({ isStrictMode = true } = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 		 	dateFormat: 'YYYY-MM-DD'
 		});
-		this.addValidator(value => typeof value === 'string' && patterns.Date(value));
-		this.addTransformer(this.getCommonTransformers());
+
+		this.appendValidator(value => value.isString() && value.invoke(patterns.Date));
 	}
 };
 
-exports.Time = class extends DateAndTime {
-	constructor({ strictMode = true } = {}) {
+exports.Time = class Time extends DateAndTime {
+	constructor({ isStrictMode = true } = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 		 	dateFormat: 'HH:mm:ss'
 		});
-		this.addValidator(value => typeof value === 'string' && patterns.Time(value));
-		this
-			.addTransformer(value => {
-				// 시간 패턴과 일치한다면 년월일을 임의로 붙여
-				// Date 객체로 만든다.
-				if(typeof value.value() === 'string' && patterns.Time(value.value())) {
-					value.value(new Date(`1970-01-01 ${value.value()}`));
-				}
 
-				return value;
-			})
-			.addTransformer(this.getCommonTransformers());
+		this.appendValidator(value => value.isString() && value.invoke(patterns.Time));
+
+		this.prependTransformer(value => {
+			// 시간 패턴과 일치한다면 년월일을 임의로 붙여
+			// Date 객체로 만든다.
+			if(value.isString() && value.invoke(patterns.Time)) {
+				value.set(new Date(`1970-01-01 ${value.get()}`));
+			}
+
+			return value;
+		});
 	}
 };
 
-exports.Datetime = class extends DateAndTime {
-	constructor({ strictMode = true } = {}) {
+exports.Datetime = class Datetime extends DateAndTime {
+	constructor({ isStrictMode = true } = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 		 	dateFormat: 'YYYY-MM-DD HH:mm:ss'
 		});
-		this.addValidator(value => typeof value === 'string' && patterns.Datetime(value));
-		this.addTransformer(this.getCommonTransformers());
+
+		this.appendValidator(value => value.isString() && value.invoke(patterns.Datetime));
 	}
 };
 
-exports.Timestamp = class extends DateAndTime {
-	constructor({ strictMode = true } = {}) {
+exports.Timestamp = class Timestamp extends DateAndTime {
+	constructor({ isStrictMode = true } = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 		 	dateFormat: 'YYYY-MM-DD HH:mm:ss'
 		});
-		this.addValidator(value => typeof value === 'string' && patterns.Timestamp(value));
-		this.addTransformer(this.getCommonTransformers());
+
+		this.appendValidator(value => value.isString() && value.invoke(patterns.Timestamp));
 	}
 };
 
-exports.Year = class extends DateAndTime {
-	constructor({ strictMode = true } = {}) {
+exports.Year = class Year extends DateAndTime {
+	constructor({ isStrictMode = true } = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 		 	dateFormat: 'YYYY'
 		});
-		this.addValidator(value => typeof value === 'string' && patterns.Year(value));
-		this
-			.addTransformer(value => {
-				// 년 패턴과 일치한다면 월일을 임의로 붙여
-				// Date 객체로 만든다.
-				if(typeof value.value() === 'string' && patterns.Year(value.value())) {
-					value.value(new Date(`${value.value()}-01-01`));
-				}
 
-				return value;
-			})
-			.addTransformer(this.getCommonTransformers());
+		this.appendValidator(value => value.isString() && value.invoke(patterns.Year));
+		
+		this.appendTransformer(value => {
+			// 년 패턴과 일치한다면 월일을 임의로 붙여
+			// Date 객체로 만든다.
+			if(value.isString() && value.invoke(patterns.Year)) {
+				value.set(new Date(`${value.get()}-01-01`));
+			}
+
+			return value;
+		});
 	}
 };

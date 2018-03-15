@@ -1,7 +1,7 @@
 exports = module.exports = {};
 
 /**
- * strictMode가 true
+ * isStrictMode가 true
  * validate는 모든 validator를 반드시 통과해야한다.
  * transform은 validate를 통과하지 못하는 입력값에 대해선 TypeError를 던진다.
  *
@@ -14,9 +14,9 @@ exports = module.exports = {};
  *
  * --->
  *
- * strictMode가 false
+ * isStrictMode가 false
  * validate는 모든 validator를 통과한 것으로 간주하고 true를 반환한다.
- * transform은 validate를 통과하지 못한 (strictMode true인 상황의 validate) 값에 대해선
+ * transform은 validate를 통과하지 못한 (isStrictMode true인 상황의 validate) 값에 대해선
  * 형변환을 시도하지만, 가능하지 않은 경우엔 입력값을 그대로 반환한다.
  *
  * validator는
@@ -28,73 +28,62 @@ exports = module.exports = {};
  * 3. 그 외에는 0으로 변환.
  */
 class Numeric extends require('./data-type').DataType {
-	constructor(options = {}) {
-		super(options);
-		this.addValidator((() => {
-			const { MIN, MAX } = this.getRanges();
-			return value => Number.isInteger(value) && value >= MIN && value <= MAX;
-		})());
-		this.addTransformer(this.getCommonTransformers());
-	}
+	constructor(attributes = {}) {
+		super(attributes);
 
-	getRanges() {
-		if(this.options.isUnsigned) {
-			return {
-				MIN: this.options.ranges.UNSIGNED_MIN,
-				MAX: this.options.ranges.UNSIGNED_MAX
-			};
-		} else {
-			return {
-				MIN: this.options.ranges.MIN,
-				MAX: this.options.ranges.MAX
-			};
-		}
-	}
+		this.appendValidator(value => value.isBetween(this.getRanges()));
 
-	getCommonTransformers() {
-		const
-			transformers = [],
-			isNumeric = value => /^[0-9]+$/.test(value),
-			{ MIN, MAX } = this.getRanges();
-
-		if(this.options.strictMode) {
-			transformers.push(value => {
-				if(!this.validate(value.value())) {
-					throw new TypeError(value.value());
+		if(this.isStrictMode()) {
+			this.appendTransformer(value => {
+				if(!this.validate(value)) {
+					throw new TypeError(value.get());
 				}
 
 				return value.resolve();
 			});
 		}
 
-		transformers.push(value => {
-			if(typeof value.value() === 'string' && isNumeric(value.value())) {
-				return value.value(value.value() * 1);
-			}
-
-			return value;
-		});
-
-		transformers.push(value => {
-			if(Number.isInteger(value.value())) {
+		this.appendTransformer([
+			value => {
+				if(value.isNumeric()) {
+					return value.set(value.get() * 1);
+				}
+	
+				return value;
+			},
+			value => {
+				if(value.isInteger()) {
+					return value
+						.setBetween(this.getRanges())
+						.resolve();
+				}
+	
 				return value
-					.value(Math.min(Math.max(value.value(), MIN), MAX))
+					.set(0)
 					.resolve();
 			}
+		]);
+	}
 
-			return value
-				.value(0)
-				.resolve();
-		});
-
-		return transformers;
+	getRanges() {
+		if(this.isUnsigned()) {
+			return {
+				MIN: this._attributes.ranges.UNSIGNED_MIN,
+				MAX: this._attributes.ranges.UNSIGNED_MAX
+			};
+		} else {
+			return {
+				MIN: this._attributes.ranges.MIN,
+				MAX: this._attributes.ranges.MAX
+			};
+		}
 	}
 }
 
-exports.TinyInt = class extends Numeric {
-	constructor({ strictMode = true, isUnsigned = false} = {}) {
+exports.TinyInt = class TinyInt extends Numeric {
+	constructor({ isStrictMode = true, isUnsigned = false} = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 			isUnsigned: isUnsigned,
 			ranges: {
 				MIN: -128,
@@ -106,10 +95,10 @@ exports.TinyInt = class extends Numeric {
 	}
 };
 
-exports.SmallInt = class extends Numeric {
-	constructor({ strictMode = true, isUnsigned = false} = {}) {
+exports.SmallInt = class SmallInt extends Numeric {
+	constructor({ isStrictMode = true, isUnsigned = false} = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 			isUnsigned: isUnsigned,
 			ranges: {
 				MIN: -32768,
@@ -121,10 +110,10 @@ exports.SmallInt = class extends Numeric {
 	}
 };
 
-exports.MediumInt = class extends Numeric {
-	constructor({ strictMode = true, isUnsigned = false} = {}) {
+exports.MediumInt = class MediumInt extends Numeric {
+	constructor({ isStrictMode = true, isUnsigned = false} = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 			isUnsigned: isUnsigned,
 			ranges: {
 				MIN: -8388608,
@@ -136,10 +125,10 @@ exports.MediumInt = class extends Numeric {
 	}
 };
 
-exports.Int = class extends Numeric {
-	constructor({ strictMode = true, isUnsigned = false} = {}) {
+exports.Int = class Int extends Numeric {
+	constructor({ isStrictMode = true, isUnsigned = false} = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 			isUnsigned: isUnsigned,
 			ranges: {
 				MIN: -2147483648,
@@ -156,10 +145,10 @@ exports.Int = class extends Numeric {
  * mysql의 BigInt의 2^63 - 1 보다는 작다. 그러므로 signed나 unsigned 모두
  * javascript의 최대 표현 한계인 2^53 - 1을 따른다.
  */
-exports.BigInt = class extends Numeric {
-	constructor({ strictMode = true, isUnsigned = false} = {}) {
+exports.BigInt = class BigInt extends Numeric {
+	constructor({ isStrictMode = true, isUnsigned = false} = {}) {
 		super({
-			strictMode: strictMode,
+			isStrictMode: isStrictMode,
 			isUnsigned: isUnsigned,
 			ranges: {
 				MAX: Number.MAX_SAFE_INTEGER,

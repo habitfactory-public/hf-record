@@ -8,80 +8,95 @@ const
 describe('data-type.js', () => {
 	describe('DataType', () => {
 		describe('Constructor', () => {
-			const dataType = new DataType();
+			const dt = new DataType();
 
-			it('checks default values', () => {
-				assert.deepEqual(dataType.options, {
-					strictMode: true
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(dt.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(dt.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(dt.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(dt.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(dt.isZeroFill());
 				});
 			});
 
 			it('vaildates "value"', () => {
-				assert.isTrue(dataType.validate('value'));
+				assert.isTrue(dt.validate('value'));
 			});
 
 			it('transforms "value" into "value"', () => {
-				assert.strictEqual(dataType.transform('value'), 'value');
+				assert.strictEqual(dt.transform('value'), 'value');
 			});
 
 			it('transforms "" into ""', () => {
-				assert.strictEqual(dataType.transform(''), '');
+				assert.strictEqual(dt.transform(''), '');
 			});
 
 			it('transforms null into null', () => {
-				assert.strictEqual(dataType.transform(null), null);
+				assert.strictEqual(dt.transform(null), null);
 			});
 
 			it('transforms undefined into undefined', () => {
-				assert.strictEqual(dataType.transform(undefined), undefined);
+				assert.strictEqual(dt.transform(undefined), undefined);
 			});
 		});
 
 		describe('Validator', () => {
-			const dataType = new DataType();
+			const dt = new DataType();
 
-			dataType.addValidator([
-				value => {
-					return value <= 20 && value >= 10;
-				},
-				value => {
-					return value === '가';
-				}
+			dt.appendValidator([
+				value => value.isBetween({
+					MIN: 10,
+					MAX: 20
+				}),
+				value => value.get() === '가'
 			]);
 
 			it('validates 5', () => {
-				assert.isFalse(dataType.validate(5));
+				assert.isFalse(dt.validate(5));
 			});
 
 			it('validates 15', () => {
-				assert.isTrue(dataType.validate(15));
+				assert.isTrue(dt.validate(15));
 			});
 
 			it('validates "가"', () => {
-				assert.isTrue(dataType.validate('가'));
+				assert.isTrue(dt.validate('가'));
 			});
 
 			it('validates "나"', () => {
-				assert.isFalse(dataType.validate('나'));
+				assert.isFalse(dt.validate('나'));
 			});
 		});
 
 		describe('Transformer', () => {
-			const dataType = new DataType();
+			const dt = new DataType();
 
-			dataType.addTransformer([
+			dt.appendTransformer([
 				value => {
-					return value.value(`inside ${value.value()} inside`);
+					return value.set(`inside ${value.get()} inside`);
 				},
 				value => {
 					return value
-						.value(`outside ${value.value()} outside`)
+						.set(`outside ${value.get()} outside`)
 						.resolve();
 				}
 			]);
 
 			it('transforms "value" into "outside inside value inside outside"', () => {
-				assert.equal(dataType.transform('value'), 'outside inside value inside outside');
+				assert.equal(dt.transform('value'), 'outside inside value inside outside');
 			});
 		});
 	});
@@ -90,7 +105,7 @@ describe('data-type.js', () => {
 		describe('createDateAndTime', () => {
 			for(let className of ['Date', 'Time', 'Datetime', 'Timestamp', 'Year']) {
 				it(className, () => {
-					assert.instanceOf(DataTypeFactory.createDateAndTime(className), DateAndTimeType[className]);
+					assert.instanceOf(DataTypeFactory[`create${className}`](className), DateAndTimeType[className]);
 				});
 			}
 		});
@@ -98,7 +113,7 @@ describe('data-type.js', () => {
 		describe('createNumeric', () => {
 			for(let className of ['TinyInt', 'SmallInt', 'MediumInt', 'Int', 'BigInt']) {
 				it(className, () => {
-					assert.instanceOf(DataTypeFactory.createNumeric(className), NumericType[className]);
+					assert.instanceOf(DataTypeFactory[`create${className}`](className), NumericType[className]);
 				});
 			}
 		});
@@ -106,7 +121,7 @@ describe('data-type.js', () => {
 		describe('createString', () => {
 			for(let className of ['Char', 'Varchar']) {
 				it(className, () => {
-					assert.instanceOf(DataTypeFactory.createString(className), StringType[className]);
+					assert.instanceOf(DataTypeFactory[`create${className}`](className), StringType[className]);
 				});
 			}
 		});

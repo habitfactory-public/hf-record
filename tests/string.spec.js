@@ -6,15 +6,34 @@ const
 // varchar length 0 - 21845 (65535byte)
 describe('string.js', () => {
 	describe('Char', () => {
-		describe('StrictMode true, length 4', () => {
-			const s = DataTypeFactory.createString('Char', {
+		describe('isStrictMode true, length 4', () => {
+			const s = DataTypeFactory.createChar({
 					length: 4
 				});
 
-			it('checks default values', () => {
-				assert.deepEqual(s.options, {
-					strictMode: true,
-					length: 4
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(s.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(s.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(s.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(s.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(s.isZeroFill());
+				});
+
+				it('getLength()', () => {
+					assert.strictEqual(s.getLength(), 4);
 				});
 			});
 
@@ -123,16 +142,35 @@ describe('string.js', () => {
 			});
 		});
 
-		describe('StrictMode false, length 4', () => {
-			const s = DataTypeFactory.createString('Char', {
-					strictMode: false,
+		describe('isStrictMode false, length 4', () => {
+			const s = DataTypeFactory.createChar({
+					isStrictMode: false,
 					length: 4
 				});
 
-			it('checks default values', () => {
-				assert.deepEqual(s.options, {
-					strictMode: false,
-					length: 4
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isFalse(s.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(s.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(s.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(s.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(s.isZeroFill());
+				});
+
+				it('getLength()', () => {
+					assert.strictEqual(s.getLength(), 4);
 				});
 			});
 
@@ -243,15 +281,34 @@ describe('string.js', () => {
 	});
 
 	describe('Varchar', () => {
-		describe('StrictMode true, length 4', () => {
-			const s = DataTypeFactory.createString('Varchar', {
+		describe('isStrictMode true, length 4', () => {
+			const s = DataTypeFactory.createVarchar({
 					length: 4
 				});
 
-			it('checks default values', () => {
-				assert.deepEqual(s.options, {
-					strictMode: true,
-					length: 4
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(s.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(s.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(s.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(s.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(s.isZeroFill());
+				});
+
+				it('getLength()', () => {
+					assert.strictEqual(s.getLength(), 4);
 				});
 			});
 
@@ -360,16 +417,35 @@ describe('string.js', () => {
 			});
 		});
 
-		describe('StrictMode false, length 4', () => {
-			const s = DataTypeFactory.createString('Varchar', {
-					strictMode: false,
+		describe('isStrictMode false, length 4', () => {
+			const s = DataTypeFactory.createVarchar({
+					isStrictMode: false,
 					length: 4
 				});
 
-			it('checks default values', () => {
-				assert.deepEqual(s.options, {
-					strictMode: false,
-					length: 4
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isFalse(s.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(s.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(s.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(s.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(s.isZeroFill());
+				});
+
+				it('getLength()', () => {
+					assert.strictEqual(s.getLength(), 4);
 				});
 			});
 
@@ -490,42 +566,60 @@ describe('string.js', () => {
 				target.values.set(value, key);
 			}
 
-			it('checks default values #1', () => {
-				const s = DataTypeFactory.createString('Enum', {
-						values: ['a', 'b', 'c', 'd']
+			describe('Check default values #1', () => {
+				const s = DataTypeFactory.createEnum({
+						length: ['a', 'b', 'c', 'd']
 					});
-				assert.deepEqual(s.options.values.keys, target.keys);
+
+				it('getLength().keys', () => {
+					assert.deepEqual(s.getLength().keys, target.keys);
+				});
+
+				it('getLength().values', () => {
+					assert.deepEqual(s.getLength().values, target.values);
+				});
 			});
 
-			it('checks default values #2', () => {
-				const s = DataTypeFactory.createString('Enum', {
-						values: ['a', 'b', 'c', 'd']
+			describe('Check default values #2', () => {
+				const s = DataTypeFactory.createEnum({
+						length: 'a, b, c, d'
 					});
-				assert.deepEqual(s.options.values.values, target.values);
-			});
 
-			it('checks default values #3', () => {
-				const s = DataTypeFactory.createString('Enum', {
-						values: 'a, b, c, d'
-					});
-				assert.deepEqual(s.options.values.keys, target.keys);
-			});
+				it('getLength().keys', () => {
+					assert.deepEqual(s.getLength().keys, target.keys);
+				});
 
-			it('checks default values #4', () => {
-				const s = DataTypeFactory.createString('Enum', {
-						values: 'a, b, c, d'
-					});
-				assert.deepEqual(s.options.values.values, target.values);
+				it('getLength().values', () => {
+					assert.deepEqual(s.getLength().values, target.values);
+				});
 			});
 		});
 
-		describe('StrictMode true', () => {
-			const s = DataTypeFactory.createString('Enum', {
-					values: ['a', 'b', 'c', 'd']
+		describe('isStrictMode true', () => {
+			const s = DataTypeFactory.createEnum({
+					length: ['a', 'b', 'c', 'd']
 				});
 
-			it('checks default values', () => {
-				assert.isTrue(s.options.strictMode);
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(s.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(s.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(s.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(s.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(s.isZeroFill());
+				});
 			});
 
 			it('validates null', () => {
@@ -585,14 +679,32 @@ describe('string.js', () => {
 			});
 		});
 
-		describe('StrictMode false', () => {
-			const s = DataTypeFactory.createString('Enum', {
-					strictMode: false,
-					values: ['a', 'b', 'c', 'd']
+		describe('isStrictMode false', () => {
+			const s = DataTypeFactory.createEnum({
+					isStrictMode: false,
+					length: ['a', 'b', 'c', 'd']
 				});
 
-			it('checks default values', () => {
-				assert.isFalse(s.options.strictMode);
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isFalse(s.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(s.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(s.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(s.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(s.isZeroFill());
+				});
 			});
 
 			it('validates null', () => {
@@ -664,42 +776,60 @@ describe('string.js', () => {
 				target.values.set(value, key);
 			}
 
-			it('checks default values #1', () => {
-				const s = DataTypeFactory.createString('Set', {
-						values: ['a', 'b', 'c', 'd']
+			describe('Check default values #1', () => {
+				const s = DataTypeFactory.createSet({
+						length: ['a', 'b', 'c', 'd']
 					});
-				assert.deepEqual(s.options.values.keys, target.keys);
+
+				it('getLength().keys', () => {
+					assert.deepEqual(s.getLength().keys, target.keys);
+				});
+
+				it('getLength().values', () => {
+					assert.deepEqual(s.getLength().values, target.values);
+				});
 			});
 
-			it('checks default values #2', () => {
-				const s = DataTypeFactory.createString('Set', {
-						values: ['a', 'b', 'c', 'd']
+			describe('Check default values #2', () => {
+				const s = DataTypeFactory.createSet({
+						length: 'a, b, c, d'
 					});
-				assert.deepEqual(s.options.values.values, target.values);
-			});
 
-			it('checks default values #3', () => {
-				const s = DataTypeFactory.createString('Set', {
-						values: 'a, b, c, d'
-					});
-				assert.deepEqual(s.options.values.keys, target.keys);
-			});
+				it('getLength().keys', () => {
+					assert.deepEqual(s.getLength().keys, target.keys);
+				});
 
-			it('checks default values #4', () => {
-				const s = DataTypeFactory.createString('Set', {
-						values: 'a, b, c, d'
-					});
-				assert.deepEqual(s.options.values.values, target.values);
+				it('getLength().values', () => {
+					assert.deepEqual(s.getLength().values, target.values);
+				});
 			});
 		});
 
-		describe('StrictMode true', () => {
-			const s = DataTypeFactory.createString('Set', {
-					values: ['a', 'b', 'c', 'd']
+		describe('isStrictMode true', () => {
+			const s = DataTypeFactory.createSet({
+					length: ['a', 'b', 'c', 'd']
 				});
 
-			it('checks default values', () => {
-				assert.isTrue(s.options.strictMode);
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isTrue(s.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(s.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(s.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(s.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(s.isZeroFill());
+				});
 			});
 
 			it('validates null', () => {
@@ -787,14 +917,32 @@ describe('string.js', () => {
 			});
 		});
 
-		describe('StrictMode false', () => {
-			const s = DataTypeFactory.createString('Set', {
-					strictMode: false,
-					values: ['a', 'b', 'c', 'd']
+		describe('isStrictMode false', () => {
+			const s = DataTypeFactory.createSet({
+					isStrictMode: false,
+					length: ['a', 'b', 'c', 'd']
 				});
 
-			it('checks default values', () => {
-				assert.isFalse(s.options.strictMode);
+			describe('Check default values', () => {
+				it('isStrictMode()', () => {
+					assert.isFalse(s.isStrictMode());
+				});
+
+				it('isNotNull()', () => {
+					assert.isFalse(s.isNotNull());
+				});
+
+				it('isBinary()', () => {
+					assert.isFalse(s.isBinary());
+				});
+
+				it('isUnsigned()', () => {
+					assert.isFalse(s.isUnsigned());
+				});
+
+				it('isZeroFill()', () => {
+					assert.isFalse(s.isZeroFill());
+				});
 			});
 
 			it('validates null', () => {
