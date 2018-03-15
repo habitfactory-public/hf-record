@@ -88,9 +88,13 @@ exports.Column = class Column {
 	}
 
 	set(value) {
-		if(this.getDataType().validate(value)) {
+		if((this._value.get() === undefined || !this.isReadonly())
+			&& this.getDataType().validate(value)) {
 			this._value.set(this.getDataType().transform(value));
+			return true;
 		}
+
+		return false;
 	}
 
 	get() {
