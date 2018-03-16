@@ -9,10 +9,12 @@ exports.Table = class Table {
 			beforeSave: [],
 			beforeCreate: [],
 			beforeUpdate: [],
+			beforeReplace: [],
 			beforeDelete: [],
 			afterSave: [],
 			afterCreate: [],
 			afterUpdate: [],
+			afterReplace: [],
 			afterDelete: []
 		}, hooks)
 
@@ -39,15 +41,19 @@ exports.Table = class Table {
 	}
 
 	runHook(name, value) {
+		if(!(value instanceof Promise)) {
+			value = Promise.resolve(value);
+		}
+
 		if(this.getHook(name).length === 0) {
-			return Promise.resolve(value);
+			return value;
 		}
 
 		return this
 			.getHook(name)
 			.reduce((accumulator, current) => {
 				return accumulator.then(current);
-			}, Promise.resolve(value));
+			}, value);
 	}
 };
 
