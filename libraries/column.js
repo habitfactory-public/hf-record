@@ -93,11 +93,20 @@ exports.Column = class Column {
 	}
 
 	set(value) {
+		// strict mode면서 not null 속성을 가졌지만 null을 입력하려고 할때는
+		// TypeError를 발생.
 		if(this.isStrictMode() && this.isNotNull() && value === null) {
 			throw new TypeError(`${this.getName()} can't be null.`);
 		}
 
+		// readonly인 경우는 값을 처음 한 번만 입력할 수 있음. (변경 불가)
 		if(this.isReadonly() && this._value.get() !== undefined) {
+			return false;
+		}
+
+		// primary key인 경우는 값을 처음 한 번만 입력할 수 있음.
+		// 또한 null은 입력 불가 (변경 불가)
+		if(this.isPrimaryKey() && (this._value.get() !== undefined || value === null)) {
 			return false;
 		}
 		

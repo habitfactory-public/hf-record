@@ -129,5 +129,35 @@ describe('column.js', () => {
 				assert.throws(() => c.set(null), TypeError, 'name can\'t be null.');
 			});
 		});
+
+		describe('PrimaryKey', () => {
+			const c = ColumnFactory.createColumn('name', 'TinyInt', {
+					isStrictMode: true,
+					isPrimaryKey: true,
+					isNotNull: true,
+					isBinary: false,
+					isUnsigned: true,
+					isZeroFill: false,
+					isReadonly: true,
+					isMagicColumn:false,
+					length: 4
+				});
+
+			it('isPrimaryKey()', () => {
+				assert.isTrue(c.isPrimaryKey());
+			});
+
+			it('set(1)', () => {
+				assert.isTrue(c.set(1));
+			});
+
+			it('set(2)', () => {
+				assert.isFalse(c.set(2));
+			});
+
+			it('get()', () => {
+				assert.strictEqual(c.get(), 1);
+			});
+		});
 	});
 });
