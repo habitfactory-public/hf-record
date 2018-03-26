@@ -47,7 +47,8 @@ exports.Column = class Column {
 			isUnsigned: false,
 			isZeroFill: false,
 			isReadonly: false,
-			isMagicColumn:false
+			isMagicColumn: false,
+			isAutoIncrement: false
 		}, attributes);
 		this._dataType = dataType;
 	}
@@ -82,6 +83,10 @@ exports.Column = class Column {
 
 	isZeroFill() {
 		return this._attributes.isZeroFill;
+	}
+
+	isAutoIncrement() {
+		return this._attributes.isAutoIncrement;
 	}
 
 	isReadonly() {
@@ -136,7 +141,8 @@ exports.ColumnFactory = class ColumnFactory {
 			isUnsigned: false,
 			isZeroFill: false,
 			isReadonly: false,
-			isMagicColumn:false
+			isMagicColumn: false,
+			isAutoIncrement: false
 		}, attributes);
 		return new (exports.Column)(
 			name, 
