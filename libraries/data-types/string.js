@@ -71,7 +71,7 @@ exports.Char = class Char extends String {
 				if(value.isInteger()) {
 					value.set(value.get() + '');
 				}
-	
+
 				return value;
 			},
 			value => {
@@ -107,7 +107,7 @@ exports.Varchar = class extends String {
 				if(value.isInteger()) {
 					value.set(value.get() + '');
 				}
-	
+
 				return value;
 			},
 			value => {
@@ -311,7 +311,7 @@ exports.Set = class Set extends String {
 	}
 };
 
-exports.TinyText = class TinyInt extends String {
+exports.TinyText = class TinyText extends String {
 	constructor({ isStrictMode = true } = {}) {
 		super({
 			isStrictMode: isStrictMode,
@@ -325,7 +325,7 @@ exports.TinyText = class TinyInt extends String {
 				if(value.isInteger()) {
 					value.set(value.get() + '');
 				}
-	
+
 				return value;
 			},
 			value => value.resolve()
@@ -333,7 +333,7 @@ exports.TinyText = class TinyInt extends String {
 	}
 };
 
-exports.Text = class extends String {
+exports.Text = class Text extends String {
 	constructor({ isStrictMode = true } = {}) {
 		super({
 			isStrictMode: isStrictMode,
@@ -347,7 +347,7 @@ exports.Text = class extends String {
 				if(value.isInteger()) {
 					value.set(value.get() + '');
 				}
-	
+
 				return value;
 			},
 			value => value.resolve()
@@ -355,7 +355,7 @@ exports.Text = class extends String {
 	}
 };
 
-exports.MediumText = class extends String {
+exports.MediumText = class MediumText extends String {
 	constructor({ isStrictMode = true } = {}) {
 		super({
 			isStrictMode: isStrictMode,
@@ -369,7 +369,7 @@ exports.MediumText = class extends String {
 				if(value.isInteger()) {
 					value.set(value.get() + '');
 				}
-	
+
 				return value;
 			},
 			value => value.resolve()
@@ -377,7 +377,7 @@ exports.MediumText = class extends String {
 	}
 };
 
-exports.LongText = class extends String {
+exports.LongText = class LongText extends String {
 	constructor({ isStrictMode = true } = {}) {
 		super({
 			isStrictMode: isStrictMode,
