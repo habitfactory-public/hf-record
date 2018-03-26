@@ -1,6 +1,8 @@
 exports = module.exports = {};
 
-const { ColumnFactory } = require('./column');
+const
+	{ ColumnFactory } = require('./column'),
+	filter = require('filter-values');
 
 exports.Table = class Table {
 	constructor(name, {columns = [], hooks = {}} = {}) {
@@ -28,12 +30,16 @@ exports.Table = class Table {
 		return this._name;
 	}
 
+	getColumn(name) {
+		return this._columns[name];
+	}
+
 	getColumns() {
 		return this._columns;
 	}
 
-	getColumn(name) {
-		return this._columns[name];
+	getFilteredColumns(filter) {
+		return filter(this.getColumns(), filter);
 	}
 
 	getHook(name) {
