@@ -13,7 +13,8 @@ describe('column.js', () => {
 					isUnsigned: true,
 					isZeroFill: false,
 					isReadonly: false,
-					isMagicColumn:false,
+					isMagicColumn: false,
+					isAutoIncrement: false,
 					length: 4
 				});
 
@@ -49,6 +50,10 @@ describe('column.js', () => {
 				assert.isFalse(c.isMagicColumn());
 			});
 
+			it('isAutoIncrement()', () => {
+				assert.isFalse(c.isAutoIncrement());
+			});
+
 			it('Before set isChanged()', () => {
 				assert.isFalse(c.isChanged());
 			});
@@ -79,7 +84,8 @@ describe('column.js', () => {
 					isUnsigned: true,
 					isZeroFill: false,
 					isReadonly: true,
-					isMagicColumn:false,
+					isMagicColumn: false,
+					isAutoIncrement: false,
 					length: 4
 				});
 
@@ -109,7 +115,8 @@ describe('column.js', () => {
 					isUnsigned: true,
 					isZeroFill: false,
 					isReadonly: true,
-					isMagicColumn:false,
+					isMagicColumn: false,
+					isAutoIncrement: false,
 					length: 4
 				});
 
@@ -139,7 +146,8 @@ describe('column.js', () => {
 					isUnsigned: true,
 					isZeroFill: false,
 					isReadonly: true,
-					isMagicColumn:false,
+					isMagicColumn: false,
+					isAutoIncrement: false,
 					length: 4
 				});
 
