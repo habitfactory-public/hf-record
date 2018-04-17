@@ -1,10 +1,8 @@
-exports = module.exports = {};
-
 const
 	{ ColumnFactory } = require('./column'),
 	filter = require('filter-values');
 
-exports.Table = class Table {
+Table = class Table {
 	constructor(name, {columns = [], hooks = {}} = {}) {
 		this._name = name;
 		this._hooks = Object.assign({}, {
@@ -30,7 +28,14 @@ exports.Table = class Table {
 		return this._name;
 	}
 
+	/**
+	 * throws	TypeError		존재하지 않는 컬럼에 접근했을 경우
+	 */
 	getColumn(name) {
+		if(this._columns[name] === undefined) {
+			throw new TypeError(`${name} 컬럼은 존재하지 않습니다.`);
+		}
+
 		return this._columns[name];
 	}
 
@@ -39,7 +44,9 @@ exports.Table = class Table {
 	}
 
 	getFilteredColumns(filter) {
-		return filter(this.getColumns(), filter);
+		return Object
+			.values(this.getColumns())
+			.filter(filter);
 	}
 
 	getHook(name) {
@@ -50,7 +57,7 @@ exports.Table = class Table {
 		if(!(value instanceof Promise)) {
 			value = Promise.resolve(value);
 		}
-
+		
 		if(this.getHook(name).length === 0) {
 			return value;
 		}
@@ -61,13 +68,17 @@ exports.Table = class Table {
 				return accumulator.then(current);
 			}, value);
 	}
-};
+}
 
-exports.TableFactory = class TableFactory {
+class TableFactory {
 	static createTable(name, {columns = [], hooks = {}} = {}) {
-		columns = columns.map(column => {
-			return ColumnFactory.createColumn(column.name, column.dataType, column.attributes);
+		return new Table(name, {
+			columns: columns.map(column => {
+				return ColumnFactory.createColumn(column.name, column.dataType, column.attributes);
+			}),
+			hooks:hooks
 		});
-		return new (exports.Table)(name, { columns, hooks });
 	}
-};
+}
+
+module.exports = { Table, TableFactory };

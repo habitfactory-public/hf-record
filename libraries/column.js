@@ -1,5 +1,3 @@
-exports = module.exports = {};
-
 const { DataTypeFactory } = require('./data-types/data-type');
 
 class ColumnValue {
@@ -35,7 +33,7 @@ class ColumnValue {
 	}
 }
 
-exports.Column = class Column {
+class Column {
 	constructor(name, dataType, attributes = {}) {
 		this._value = new ColumnValue();
 		this._name = name;
@@ -130,9 +128,9 @@ exports.Column = class Column {
 	isChanged() {
 		return this._value.isChanged();
 	}
-};
+}
 
-exports.ColumnFactory = class ColumnFactory {
+class ColumnFactory {
 	static createColumn(name, dataTypeClassName, attributes = {}) {
 		attributes = Object.assign({}, {
 			isPrimaryKey: false,
@@ -144,10 +142,12 @@ exports.ColumnFactory = class ColumnFactory {
 			isMagicColumn: false,
 			isAutoIncrement: false
 		}, attributes);
-		return new (exports.Column)(
+		return new Column(
 			name, 
 			DataTypeFactory[`create${dataTypeClassName}`](attributes), 
 			attributes
 		);
 	}
-};
+}
+
+module.exports = { ColumnValue, Column, ColumnFactory };

@@ -18,7 +18,9 @@ class DataTypeValue {
 	get length() {
 		if(this.isInteger()) {
 			return (this._value + '').length;
-		} else if(this.isString() || this.isArray()) {
+		} else if(this.isString()) {
+			return this._value.trimRight().length;
+		} else if(this.isArray()) {
 			return this._value.length;
 		} else {
 			return 0;
@@ -102,7 +104,7 @@ class DataTypeValue {
 	}
 
 	get() {
-		return this._value;
+		return this.isString() && this._value !== null ? this._value.trimRight() : this._value;
 	}
 }
 

@@ -157,7 +157,7 @@ exports.Year = class Year extends DateAndTime {
 
 		this.appendValidator(value => value.isString() && value.invoke(patterns.Year));
 		
-		this.appendTransformer(value => {
+		this.prependTransformer(value => {
 			// 년 패턴과 일치한다면 월일을 임의로 붙여
 			// Date 객체로 만든다.
 			if(value.isString() && value.invoke(patterns.Year)) {
