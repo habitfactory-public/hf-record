@@ -1,9 +1,5 @@
 exports = module.exports = {};
 
-const rtrim = string => {
-		return string !== null ? string.trimRight() : null;
-	};
-
 /**
  * isStrictMode가 true
  * validate는 모든 validator를 반드시 통과해야한다.
@@ -62,7 +58,7 @@ exports.Char = class Char extends String {
 		});
 
 		this.appendValidator([
-			value => value.isString() && value.get().trimRight().length <= this.getLength(),
+			value => value.isString() && value.length <= this.getLength(),
 			value => value.isInteger() && value.length <= this.getLength()
 		]);
 
@@ -83,14 +79,14 @@ exports.Char = class Char extends String {
 			},
 			value => {
 				return value
-					.set(value.get().trimRight())
+					.set(value.get())
 					.resolve();
 			}
 		]);
 	}
 };
 
-exports.Varchar = class extends String {
+exports.Varchar = class Varchar extends String {
 	constructor({ isStrictMode = true, length = 21844} = {}) {
 		super({
 			isStrictMode: isStrictMode,
@@ -98,7 +94,7 @@ exports.Varchar = class extends String {
 		});
 
 		this.appendValidator([
-			value => value.isString() && value.get().trimRight().length <= this.getLength(),
+			value => value.isString() && value.length <= this.getLength(),
 			value => value.isInteger() && value.length <= this.getLength()
 		]);
 
@@ -119,7 +115,7 @@ exports.Varchar = class extends String {
 			},
 			value => {
 				return value
-					.set(value.get().trimRight())
+					.set(value.get())
 					.resolve();
 			}
 		]);
