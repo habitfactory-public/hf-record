@@ -3,10 +3,10 @@ exports = module.exports = {};
 const
 	moment = require('moment'),
 	patterns = {
-		Date: value => /^[19]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(value),
+		Date: value => /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(value),
 		Time: value => /^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(value),
-		Datetime: value => /^[19]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(value),
-		Timestamp: value => /^[19]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(value),
+		Datetime: value => /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(value),
+		Timestamp: value => /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(value), // TODO '1970-01-01 00:00:01.000000' to '2038-01-19 03:14:07.999999' 
 		Year: value => /^(19(0[1-9]|[1-9][0-9])|2(0[0-9]{2}|1([0-4][0-9]|5[0-5])))$/.test(value),
 	};
 
@@ -101,7 +101,9 @@ exports.Date = class Date_ extends DateAndTime {
 		 	dateFormat: 'YYYY-MM-DD'
 		});
 
-		this.appendValidator(value => value.isString() && value.invoke(patterns.Date));
+		this.appendValidator(value => {
+			return value.isString() && value.invoke(patterns.Date);
+		});
 	}
 };
 
