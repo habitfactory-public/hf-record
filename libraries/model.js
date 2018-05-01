@@ -94,7 +94,7 @@ class Model {
 	getValues() {
 		return this
 			.getTable()
-			.getFilteredColumns(column => column.get() !== undefined && !column.isPrimaryKey() && !column.isMagicColumn() && !column.isAutoIncrement())
+			.getFilteredColumns(column => column.get() !== undefined && !column.isMagicColumn() && !column.isAutoIncrement())
 			.reduce((accumulator, current) => {
 				accumulator[current.getName()] = current.get();
 				return accumulator;
