@@ -1,2 +1,1 @@
-# hf-record-node
-habitfactory's active record style database library for nodejs
+Do not use for production. This is not Fully developed.
