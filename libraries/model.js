@@ -112,7 +112,7 @@ class Model {
 
 			query = Object
 				.keys(objects)
-				.map(key => `${key} = ?`)
+				.map(key => `\`${key}\` = ?`)
 				.join(' AND ');
 			replacers = Object.values(objects);
 		}
@@ -208,7 +208,7 @@ class Model {
 								.runHook('afterCreate', self);
 						});
 				}
-			})
+			});
 	}
 
 	createIfNotExist({ query = null, replacers = null } = {}) {
